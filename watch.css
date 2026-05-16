@@ -721,3 +721,36 @@ body{
   }
 
 }
+/* FIX FOOTER CLICK ISSUE */
+
+.premium-footer{
+  position:relative;
+  z-index:50;
+}
+
+.footer-links{
+  position:relative;
+  z-index:60;
+}
+
+.footer-links a{
+  position:relative;
+  z-index:70;
+  pointer-events:auto;
+}
+
+.footer-glow{
+  pointer-events:none;
+}
+
+.bg-overlay{
+  pointer-events:none;
+}
+
+.particles{
+  pointer-events:none;
+}
+
+.ambient-light{
+  pointer-events:none;
+}

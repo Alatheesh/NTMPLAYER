@@ -1,46 +1,79 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Watch</title>
+  <title>Advanced Streaming Player</title>
+
+  <!-- Plyr CSS -->
+  <link rel="stylesheet"
+  href="https://cdn.plyr.io/3.7.8/plyr.css" />
 
   <style>
+
     body{
-      background:black;
-      color:white;
-      text-align:center;
-      font-family:Arial;
+      margin:0;
       padding:20px;
+      background:#000;
+      color:white;
+      font-family:Arial;
+      text-align:center;
     }
 
-    button, select{
-      padding:10px;
-      margin:5px;
-      border:none;
-      border-radius:6px;
-      font-size:16px;
+    h2{
+      margin-bottom:20px;
+    }
+
+    .top-buttons{
+      margin-bottom:20px;
     }
 
     button{
+      padding:10px 18px;
+      border:none;
+      border-radius:8px;
       background:#007bff;
       color:white;
       cursor:pointer;
+      font-size:15px;
+      margin:5px;
+    }
+
+    button:hover{
+      opacity:0.9;
+    }
+
+    .controls-box{
+      margin-top:20px;
+      margin-bottom:20px;
     }
 
     select{
+      padding:10px;
+      border-radius:8px;
+      border:none;
       background:#222;
       color:white;
+      margin-left:10px;
+      font-size:15px;
+    }
+
+    .player-wrapper{
+      width:100%;
+      display:flex;
+      justify-content:center;
+      margin-top:20px;
     }
 
     video{
-      margin-top:20px;
-      width:90%;
-      max-width:1000px;
-      border-radius:10px;
+      width:95%;
+      max-width:1100px;
+      border-radius:12px;
       background:black;
     }
 
-    .controls{
-      margin-top:20px;
+    .status{
+      margin-top:15px;
+      color:#aaa;
+      font-size:14px;
     }
 
     .disclaimer{
@@ -54,57 +87,61 @@
       margin-left:auto;
       margin-right:auto;
       font-size:14px;
-      line-height:1.6;
+      line-height:1.7;
     }
 
     .disclaimer h3{
       color:#ffcc00;
-      margin-bottom:10px;
     }
+
   </style>
 </head>
 
 <body>
 
-<h2>🎬 Player</h2>
+<h2>🎬 Advanced Streaming Player</h2>
 
-<button onclick="history.back()">
-  ⬅ Back
-</button>
+<div class="top-buttons">
 
-<br><br>
+  <button onclick="history.back()">
+    ⬅ Back
+  </button>
 
-<button onclick="start()">
-  ▶ Start Streaming
-</button>
-
-<div class="controls">
-
-  <div style="margin-top:15px;">
-
-    <label>🔊 Audio:</label>
-
-    <select id="audioSelect">
-      <option>Loading...</option>
-    </select>
-
-  </div>
-
-  <div style="margin-top:15px;">
-
-    <label>💬 Subtitles:</label>
-
-    <select id="subSelect">
-      <option value="-1">Off</option>
-    </select>
-
-  </div>
+  <button onclick="startStreaming()">
+    ▶ Start Streaming
+  </button>
 
 </div>
 
-<br>
+<div class="controls-box">
 
-<video id="player" controls style="display:none;"></video>
+  🔊 Audio:
+  <select id="audioSelect">
+    <option>Loading...</option>
+  </select>
+
+  &nbsp;&nbsp;
+
+  💬 Subtitles:
+  <select id="subtitleSelect">
+    <option value="-1">Off</option>
+  </select>
+
+</div>
+
+<div class="player-wrapper">
+
+  <video
+    id="player"
+    controls
+    playsinline>
+  </video>
+
+</div>
+
+<div class="status" id="status">
+  Waiting for stream...
+</div>
 
 <!-- DISCLAIMER -->
 
@@ -113,11 +150,11 @@
   <h3>⚠ Disclaimer</h3>
 
   <p>
-    This website does not host, upload, store, or distribute any video files on its own servers.
+    This website does not host, upload, store, or distribute any media files on its own servers.
   </p>
 
   <p>
-    All media content is streamed directly from third-party publicly available sources provided by users.
+    All content is streamed directly from publicly available third-party sources provided by users.
   </p>
 
   <p>
@@ -128,24 +165,40 @@
 
 </div>
 
+<!-- Plyr JS -->
+
+<script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+
 <script>
 
-const player = document.getElementById("player");
+const video =
+document.getElementById("player");
 
-const audioSelect = document.getElementById("audioSelect");
+const audioSelect =
+document.getElementById("audioSelect");
 
-const subSelect = document.getElementById("subSelect");
+const subtitleSelect =
+document.getElementById("subtitleSelect");
+
+const statusText =
+document.getElementById("status");
 
 
-// ─────────────────────────────
-// START PLAYER
-// ─────────────────────────────
+// INIT PLYR
 
-function start(){
+const player =
+new Plyr('#player');
 
-  const params = new URLSearchParams(location.search);
 
-  const link = params.get("link");
+// START STREAMING
+
+function startStreaming(){
+
+  const params =
+  new URLSearchParams(location.search);
+
+  const link =
+  params.get("link");
 
   if(!link){
 
@@ -154,48 +207,100 @@ function start(){
     return;
   }
 
-  player.style.display = "block";
+  statusText.innerText =
+  "Loading stream...";
 
-  player.src = link;
+  video.src = link;
+
+  // Wait for metadata
+  setTimeout(loadTracks,3000);
 }
 
 
-// ─────────────────────────────
-// AUDIO TRACKS
-// ─────────────────────────────
+// LOAD TRACKS
 
-function loadAudioTracks(){
+function loadTracks(){
 
-  const tracks = player.audioTracks;
+  console.log("Audio Tracks:",
+  video.audioTracks);
 
-  if(!tracks || tracks.length === 0){
+  console.log("Subtitle Tracks:",
+  video.textTracks);
+
+  // AUDIO TRACKS
+
+  if(video.audioTracks &&
+     video.audioTracks.length > 0){
+
+    audioSelect.innerHTML = "";
+
+    for(let i=0;
+        i<video.audioTracks.length;
+        i++){
+
+      const track =
+      video.audioTracks[i];
+
+      const option =
+      document.createElement("option");
+
+      option.value = i;
+
+      option.textContent =
+        track.label ||
+        track.language ||
+        ("Track " + (i+1));
+
+      audioSelect.appendChild(option);
+    }
+
+    statusText.innerText =
+    "Audio tracks detected ✅";
+
+  } else {
 
     audioSelect.innerHTML =
-      "<option>No audio tracks</option>";
+    "<option>No audio tracks found</option>";
 
-    return;
+    statusText.innerText =
+    "No switchable audio tracks detected ⚠";
   }
 
-  audioSelect.innerHTML = "";
 
-  for(let i=0;i<tracks.length;i++){
+  // SUBTITLE TRACKS
 
-    const option = document.createElement("option");
+  if(video.textTracks &&
+     video.textTracks.length > 0){
 
-    option.value = i;
+    for(let i=0;
+        i<video.textTracks.length;
+        i++){
 
-    option.textContent =
-      tracks[i].label ||
-      tracks[i].language ||
-      ("Track " + (i+1));
+      const track =
+      video.textTracks[i];
 
-    audioSelect.appendChild(option);
+      const option =
+      document.createElement("option");
+
+      option.value = i;
+
+      option.textContent =
+        track.label ||
+        track.language ||
+        ("Subtitle " + (i+1));
+
+      subtitleSelect.appendChild(option);
+    }
   }
 }
 
-audioSelect.addEventListener("change", () => {
 
-  const tracks = player.audioTracks;
+// AUDIO SWITCHING
+
+audioSelect.addEventListener("change",()=>{
+
+  const tracks =
+  video.audioTracks;
 
   if(!tracks) return;
 
@@ -207,69 +312,39 @@ audioSelect.addEventListener("change", () => {
 });
 
 
-// ─────────────────────────────
-// SUBTITLE TRACKS
-// ─────────────────────────────
+// SUBTITLE SWITCHING
 
-function loadSubTracks(){
+subtitleSelect.addEventListener("change",()=>{
 
-  const tracks = player.textTracks;
-
-  if(!tracks || tracks.length === 0){
-
-    return;
-  }
-
-  for(let i=0;i<tracks.length;i++){
-
-    const option = document.createElement("option");
-
-    option.value = i;
-
-    option.textContent =
-      tracks[i].label ||
-      tracks[i].language ||
-      ("Subtitle " + (i+1));
-
-    subSelect.appendChild(option);
-  }
-}
-
-subSelect.addEventListener("change", () => {
-
-  const tracks = player.textTracks;
-
-  if(!tracks) return;
+  const tracks =
+  video.textTracks;
 
   for(let i=0;i<tracks.length;i++){
 
     tracks[i].mode =
-      (i == subSelect.value)
+      (i == subtitleSelect.value)
       ? "showing"
       : "hidden";
   }
 });
 
 
-// ─────────────────────────────
-// VIDEO EVENTS
-// ─────────────────────────────
+// EVENTS
 
-player.addEventListener("loadedmetadata", () => {
+video.addEventListener("loadedmetadata",()=>{
 
-  loadAudioTracks();
+  statusText.innerText =
+  "Video loaded ✅";
 
-  loadSubTracks();
+  loadTracks();
 });
 
+video.onerror = ()=>{
 
-// ─────────────────────────────
-// ERROR HANDLING
-// ─────────────────────────────
+  statusText.innerText =
+  "⚠ Failed to load video";
 
-player.onerror = () => {
-
-  alert("⚠ Video failed to load");
+  alert("Video failed to load ❌");
 };
 
 </script>

@@ -4,6 +4,9 @@ document.getElementById("status");
 const debugBox =
 document.getElementById("debugBox");
 
+const languageSelect =
+document.getElementById("languageSelect");
+
 
 // DEBUG LOGGER
 
@@ -16,7 +19,16 @@ function logDebug(text){
 }
 
 
-// INIT PLAYER
+// AUDIO PLAYER
+
+const audioPlayer =
+new Audio();
+
+audioPlayer.crossOrigin =
+"anonymous";
+
+
+// INIT VIDEO PLAYER
 
 const player = videojs(
   'videoPlayer',
@@ -30,6 +42,11 @@ const player = videojs(
 );
 
 
+// AUDIO STORAGE
+
+let audioLinks = {};
+
+
 // START STREAM
 
 function startStreaming(){
@@ -39,6 +56,40 @@ function startStreaming(){
 
   const link =
   params.get("link");
+
+  // DYNAMIC AUDIO LINKS
+
+  const telugu =
+  params.get("telugu");
+
+  const hindi =
+  params.get("hindi");
+
+  const tamil =
+  params.get("tamil");
+
+  const english =
+  params.get("english");
+
+
+  // BUILD AUDIO OBJECT
+
+  if(telugu){
+    audioLinks.telugu = telugu;
+  }
+
+  if(hindi){
+    audioLinks.hindi = hindi;
+  }
+
+  if(tamil){
+    audioLinks.tamil = tamil;
+  }
+
+  if(english){
+    audioLinks.english = english;
+  }
+
 
   if(!link){
 
@@ -92,6 +143,24 @@ function startStreaming(){
     logDebug("Player ready.");
 
     inspectTracks();
+
+    setupSync();
+
+    // AUTO LOAD FIRST AUDIO
+
+    const firstLanguage =
+    Object.keys(audioLinks)[0];
+
+    if(firstLanguage){
+
+      loadAudio(firstLanguage);
+
+      logDebug(
+        "Default audio: " +
+        firstLanguage
+      );
+    }
+
   });
 
   player.on('error',()=>{
@@ -111,52 +180,155 @@ function startStreaming(){
 }
 
 
-// TRACKS
+// LOAD AUDIO
+
+function loadAudio(language){
+
+  const audioUrl =
+  audioLinks[language];
+
+  if(!audioUrl){
+
+    logDebug(
+      "Missing audio for: " +
+      language
+    );
+
+    return;
+  }
+
+  const currentTime =
+  player.currentTime();
+
+  audioPlayer.src =
+  audioUrl;
+
+  audioPlayer.currentTime =
+  currentTime;
+
+  audioPlayer.play();
+
+  logDebug(
+    "Audio changed to: " +
+    language
+  );
+}
+
+
+// LANGUAGE SWITCH
+
+if(languageSelect){
+
+  languageSelect.addEventListener(
+    "change",
+    (e)=>{
+
+      loadAudio(
+        e.target.value
+      );
+    }
+  );
+}
+
+
+// SYNC ENGINE
+
+function setupSync(){
+
+  // PLAY
+
+  player.on('play',()=>{
+
+    audioPlayer.play();
+
+    logDebug(
+      "Playback started."
+    );
+  });
+
+  // PAUSE
+
+  player.on('pause',()=>{
+
+    audioPlayer.pause();
+
+    logDebug(
+      "Playback paused."
+    );
+  });
+
+  // SEEK
+
+  player.on('seeking',()=>{
+
+    audioPlayer.currentTime =
+    player.currentTime();
+
+    logDebug(
+      "Syncing seek..."
+    );
+  });
+
+  // WAITING
+
+  player.on('waiting',()=>{
+
+    audioPlayer.pause();
+
+    logDebug(
+      "Buffering..."
+    );
+  });
+
+  // PLAYING
+
+  player.on('playing',()=>{
+
+    audioPlayer.play();
+
+    logDebug(
+      "Playing resumed."
+    );
+  });
+
+  // AUTO RESYNC
+
+  setInterval(()=>{
+
+    const diff =
+    Math.abs(
+      player.currentTime() -
+      audioPlayer.currentTime
+    );
+
+    if(diff > 0.5){
+
+      audioPlayer.currentTime =
+      player.currentTime();
+
+      logDebug(
+        "Audio resynced."
+      );
+    }
+
+  },1000);
+
+}
+
+
+// TRACK INSPECTION
 
 function inspectTracks(){
 
   try{
 
-    const audioTracks =
-    player.audioTracks();
-
     const textTracks =
     player.textTracks();
-
-    logDebug(
-      "AudioTracks object: " +
-      (!!audioTracks)
-    );
 
     logDebug(
       "TextTracks object: " +
       (!!textTracks)
     );
-
-    if(audioTracks){
-
-      logDebug(
-        "Audio track count: " +
-        audioTracks.length
-      );
-
-      for(let i=0;
-          i<audioTracks.length;
-          i++){
-
-        const track =
-        audioTracks[i];
-
-        logDebug(
-          "Track " + i +
-          " | label: " +
-          track.label +
-          " | language: " +
-          track.language
-        );
-      }
-
-    }
 
     if(textTracks){
 
@@ -191,23 +363,9 @@ player.on('loadedmetadata',()=>{
 });
 
 
-player.on('play',()=>{
-
-  logDebug(
-    "Playback started."
-  );
-});
-
-
-player.on('waiting',()=>{
-
-  logDebug(
-    "Buffering..."
-  );
-});
-
-
 player.on('dispose',()=>{
+
+  audioPlayer.pause();
 
   logDebug(
     "Player disposed."

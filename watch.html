@@ -4,416 +4,88 @@
 
   <meta charset="UTF-8">
 
-  <meta name="viewport"
-  content="width=device-width, initial-scale=1.0">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-  <title>Video.js Streaming Player</title>
+  <title>Streaming Player</title>
 
-  <!-- VIDEO.JS CSS -->
-
+  <!-- Video.js -->
   <link
-  href="https://vjs.zencdn.net/8.10.0/video-js.css"
-  rel="stylesheet"/>
+    href="https://vjs.zencdn.net/8.10.0/video-js.css"
+    rel="stylesheet"
+  >
 
-  <style>
-
-    body{
-      margin:0;
-      padding:20px;
-      background:#000;
-      color:white;
-      font-family:Arial;
-      text-align:center;
-    }
-
-    h2{
-      margin-bottom:20px;
-    }
-
-    .top-buttons{
-      margin-bottom:20px;
-    }
-
-    button{
-      padding:10px 18px;
-      border:none;
-      border-radius:8px;
-      background:#007bff;
-      color:white;
-      cursor:pointer;
-      font-size:15px;
-      margin:5px;
-    }
-
-    button:hover{
-      opacity:0.9;
-    }
-
-    .player-wrapper{
-      width:100%;
-      display:flex;
-      justify-content:center;
-      margin-top:20px;
-    }
-
-    .video-container{
-      width:95%;
-      max-width:1100px;
-    }
-
-    .video-js{
-      width:100%;
-      height:620px;
-      border-radius:12px;
-      overflow:hidden;
-      background:black;
-    }
-
-    .status{
-      margin-top:20px;
-      color:#00ff88;
-      font-size:14px;
-      line-height:1.6;
-    }
-
-    .debug-box{
-      margin-top:20px;
-      background:#111;
-      border:1px solid #333;
-      border-radius:10px;
-      padding:15px;
-      max-width:1000px;
-      margin-left:auto;
-      margin-right:auto;
-      text-align:left;
-      color:#00ff88;
-      font-size:13px;
-      overflow:auto;
-      white-space:pre-wrap;
-    }
-
-    .disclaimer{
-      margin-top:40px;
-      padding:15px;
-      border:1px solid #444;
-      border-radius:10px;
-      background:#111;
-      color:#bbb;
-      max-width:900px;
-      margin-left:auto;
-      margin-right:auto;
-      font-size:14px;
-      line-height:1.7;
-    }
-
-    .disclaimer h3{
-      color:#ffcc00;
-    }
-
-    @media(max-width:768px){
-
-      .video-js{
-        height:240px;
-      }
-    }
-
-  </style>
+  <!-- CSS -->
+  <link
+    rel="stylesheet"
+    href="css/watch.css"
+  >
 
 </head>
 
 <body>
 
-<h2>🎬 Video.js Streaming Player</h2>
+  <h2>🎬 Streaming Player</h2>
 
-<div class="top-buttons">
+  <div class="top-buttons">
 
-  <button onclick="history.back()">
-    ⬅ Back
-  </button>
+    <button onclick="history.back()">
+      ⬅ Back
+    </button>
 
-  <button onclick="startStreaming()">
-    ▶ Start Streaming
-  </button>
-
-</div>
-
-<div class="player-wrapper">
-
-  <div class="video-container">
-
-    <video
-      id="videoPlayer"
-      class="video-js vjs-default-skin vjs-big-play-centered"
-      controls
-      preload="auto"
-      playsinline>
-
-    </video>
+    <button onclick="startStreaming()">
+      ▶ Start Streaming
+    </button>
 
   </div>
 
-</div>
+  <div class="player-wrapper">
 
-<div class="status" id="status">
+    <div class="video-container">
 
-  Waiting for stream...
+      <video
+        id="videoPlayer"
+        class="video-js vjs-default-skin vjs-big-play-centered"
+        controls
+        preload="auto"
+        playsinline
+      ></video>
 
-</div>
+    </div>
 
-<div class="debug-box" id="debugBox">
+  </div>
 
-  Debug logs will appear here...
+  <div class="status" id="status">
+    Waiting for stream...
+  </div>
 
-</div>
+  <div class="debug-box" id="debugBox">
+    Debug logs will appear here...
+  </div>
 
-<div class="disclaimer">
+  <div class="disclaimer">
 
-  <h3>⚠ Disclaimer</h3>
+    <h3>⚠ Disclaimer</h3>
 
-  <p>
-    This website does not host, upload, store, or distribute any media files on its own servers.
-  </p>
+    <p>
+      This website does not host, upload,
+      store, or distribute any media files.
+    </p>
 
-  <p>
-    All content is streamed directly from publicly available third-party sources provided by users.
-  </p>
+    <p>
+      All content is streamed from
+      third-party sources.
+    </p>
 
-  <p>
-    We do not claim ownership of any content displayed through this player.
-  </p>
+  </div>
 
-</div>
+  <!-- Video.js -->
+  <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
 
-<!-- VIDEO.JS -->
-
-<script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
-
-<script>
-
-const statusText =
-document.getElementById("status");
-
-const debugBox =
-document.getElementById("debugBox");
-
-
-// DEBUG LOGGER
-
-function logDebug(text){
-
-  console.log(text);
-
-  debugBox.innerHTML +=
-  "\\n" + text;
-}
-
-
-// INIT VIDEO.JS
-
-const player = videojs(
-  'videoPlayer',
-  {
-    controls:true,
-    autoplay:false,
-    preload:'auto',
-    fluid:true,
-    responsive:true
-  }
-);
-
-
-// START STREAMING
-
-function startStreaming(){
-
-  const params =
-  new URLSearchParams(location.search);
-
-  const link =
-  params.get("link");
-
-  if(!link){
-
-    alert("No video link found ❌");
-
-    return;
-  }
-
-  debugBox.innerHTML = "";
-
-  statusText.innerText =
-  "Loading stream...";
-
-  logDebug("Loading stream...");
-  logDebug("URL received.");
-
-  // DETECT TYPE
-
-  let type = "video/mp4";
-
-  if(link.includes(".m3u8")){
-
-    type =
-    "application/x-mpegURL";
-  }
-
-  else if(link.includes(".mpd")){
-
-    type =
-    "application/dash+xml";
-  }
-
-  else if(link.includes(".mkv")){
-
-    type =
-    "video/x-matroska";
-  }
-
-  logDebug(
-    "Detected type: " + type
-  );
-
-  player.src({
-    src:link,
-    type:type
-  });
-
-  player.ready(()=>{
-
-    statusText.innerText =
-    "Video loaded ✅";
-
-    logDebug(
-      "Player ready."
-    );
-
-    inspectTracks();
-  });
-
-  player.on('error',()=>{
-
-    const error =
-    player.error();
-
-    statusText.innerText =
-    "⚠ Video failed";
-
-    logDebug(
-      "Player Error: " +
-      JSON.stringify(error)
-    );
-  });
-}
-
-
-// INSPECT TRACKS
-
-function inspectTracks(){
-
-  try{
-
-    const audioTracks =
-    player.audioTracks();
-
-    const textTracks =
-    player.textTracks();
-
-    logDebug(
-      "AudioTracks object: " +
-      (!!audioTracks)
-    );
-
-    logDebug(
-      "TextTracks object: " +
-      (!!textTracks)
-    );
-
-    if(audioTracks){
-
-      logDebug(
-        "Audio track count: " +
-        audioTracks.length
-      );
-
-      for(let i=0;
-          i<audioTracks.length;
-          i++){
-
-        const track =
-        audioTracks[i];
-
-        logDebug(
-          "Track " + i +
-          " | label: " +
-          track.label +
-          " | language: " +
-          track.language
-        );
-      }
-
-    } else {
-
-      logDebug(
-        "audioTracks unsupported"
-      );
-    }
-
-    if(textTracks){
-
-      logDebug(
-        "Subtitle track count: " +
-        textTracks.length
-      );
-    }
-
-  }
-
-  catch(error){
-
-    logDebug(
-      "Track inspection failed: " +
-      error.message
-    );
-  }
-}
-
-
-// EVENTS
-
-player.on('loadedmetadata',()=>{
-
-  logDebug(
-    "loadedmetadata fired."
-  );
-
-  inspectTracks();
-});
-
-
-player.on('play',()=>{
-
-  logDebug(
-    "Playback started."
-  );
-});
-
-
-player.on('waiting',()=>{
-
-  logDebug(
-    "Buffering..."
-  );
-});
-
-
-player.on('dispose',()=>{
-
-  logDebug(
-    "Player disposed."
-  );
-});
-
-</script>
+  <!-- JS -->
+  <script src="js/watch.js"></script>
 
 </body>
 </html>

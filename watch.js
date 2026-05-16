@@ -1,39 +1,24 @@
-const statusText =
-document.getElementById("status");
-
-const debugBox =
-document.getElementById("debugBox");
-
-const languageSelect =
-document.getElementById("languageSelect");
-
+const statusText=document.getElementById("status");
+const debugBox=document.getElementById("debugBox");
+const languageSelect=document.getElementById("languageSelect");
 
 // DEBUG LOGGER
 
 function logDebug(text){
-
   console.log(text);
-
-  debugBox.innerHTML +=
-  "\n" + text;
+  debugBox.innerHTML += "\n" + text;
 }
-
 
 // AUDIO PLAYER
 
-const audioPlayer =
-new Audio();
+const audioPlayer=new Audio();
 
-audioPlayer.crossOrigin =
-"anonymous";
-
-audioPlayer.preload =
-"auto";
-
+audioPlayer.crossOrigin="anonymous";
+audioPlayer.preload="auto";
 
 // VIDEO PLAYER
 
-const player = videojs(
+const player=videojs(
   'videoPlayer',
   {
     controls:true,
@@ -44,50 +29,41 @@ const player = videojs(
   }
 );
 
-
 // AUDIO STORAGE
 
-let audioLinks = [];
-
+let audioLinks=[];
 
 // START STREAM
 
 function startStreaming(){
 
-  const params =
+  const params=
   new URLSearchParams(location.search);
 
-  const link =
+  const link=
   params.get("link");
 
-  // GET AUDIOS
-
-  const audiosRaw =
+  const audiosRaw=
   params.get("audios");
 
   try{
 
-    const parsedAudios =
+    const parsedAudios=
     JSON.parse(
       decodeURIComponent(
         audiosRaw || "[]"
       )
     );
 
-    audioLinks =
+    audioLinks=
     parsedAudios.map(item=>{
 
-      const parts =
+      const parts=
       item.split("|");
 
-      return {
-
-        lang:
-        parts[0],
-
-        url:
-        parts[1]
-
+      return{
+        lang:parts[0],
+        url:parts[1]
       };
 
     });
@@ -100,9 +76,9 @@ function startStreaming(){
       "Audio parse failed"
     );
 
-    audioLinks = [];
-  }
+    audioLinks=[];
 
+  }
 
   if(!link){
 
@@ -111,18 +87,17 @@ function startStreaming(){
     );
 
     return;
+
   }
 
-  debugBox.innerHTML = "";
+  debugBox.innerHTML="";
 
-  statusText.innerText =
+  statusText.innerText=
   "Loading stream...";
 
   logDebug(
     "Loading stream..."
   );
-
-  // DEBUG LINKS
 
   logDebug(
     "VIDEO LINK:"
@@ -143,36 +118,35 @@ function startStreaming(){
   audioLinks.forEach(audio=>{
 
     logDebug(
-
       audio.lang +
       " → " +
       audio.url
-
     );
 
   });
 
-  // VIDEO TYPE
-
-  let type =
+  let type=
   "video/mp4";
 
   if(link.includes(".m3u8")){
 
-    type =
+    type=
     "application/x-mpegURL";
+
   }
 
   else if(link.includes(".mpd")){
 
-    type =
+    type=
     "application/dash+xml";
+
   }
 
   else if(link.includes(".mkv")){
 
-    type =
+    type=
     "video/x-matroska";
+
   }
 
   logDebug(
@@ -180,24 +154,16 @@ function startStreaming(){
     type
   );
 
-  // LOAD VIDEO
-
   player.src({
-
     src:link,
     type:type
-
   });
-
-  // PLAYER READY
 
   player.ready(()=>{
 
-    // MUTE ORIGINAL AUDIO
-
     player.muted(true);
 
-    statusText.innerText =
+    statusText.innerText=
     "Video loaded ✅";
 
     logDebug(
@@ -210,8 +176,6 @@ function startStreaming(){
 
     setupSync();
 
-    // AUTO LOAD FIRST AUDIO
-
     if(audioLinks.length > 0){
 
       loadAudio(
@@ -222,28 +186,22 @@ function startStreaming(){
 
   });
 
-  // ERROR
-
   player.on('error',()=>{
 
-    const error =
+    const error=
     player.error();
 
-    statusText.innerText =
+    statusText.innerText=
     "⚠ Video failed";
 
     logDebug(
-
       "Player Error: " +
-
       JSON.stringify(error)
-
     );
 
   });
 
 }
-
 
 // BUILD LANGUAGE SELECTOR
 
@@ -252,20 +210,19 @@ function buildLanguageSelector(){
   if(!languageSelect)
   return;
 
-  languageSelect.innerHTML =
-  "";
+  languageSelect.innerHTML="";
 
   audioLinks.forEach(audio=>{
 
-    const option =
+    const option=
     document.createElement(
       "option"
     );
 
-    option.value =
+    option.value=
     audio.url;
 
-    option.textContent =
+    option.textContent=
     audio.lang;
 
     languageSelect.appendChild(
@@ -276,7 +233,6 @@ function buildLanguageSelector(){
 
 }
 
-
 // LOAD AUDIO
 
 async function loadAudio(audioObj){
@@ -286,26 +242,44 @@ async function loadAudio(audioObj){
 
   try{
 
-    const currentTime =
+    const currentTime=
     player.currentTime();
-
-    // STOP OLD AUDIO
 
     audioPlayer.pause();
 
-    // LOAD NEW AUDIO
-
-    audioPlayer.src =
+    audioPlayer.src=
     audioObj.url;
+
+    logDebug(
+      "TRYING AUDIO:"
+    );
+
+    logDebug(
+      audioObj.url
+    );
+
+    audioPlayer.onerror=()=>{
+
+      logDebug(
+        "AUDIO LOAD FAILED"
+      );
+
+    };
+
+    audioPlayer.oncanplay=()=>{
+
+      logDebug(
+        "AUDIO CAN PLAY"
+      );
+
+    };
 
     audioPlayer.load();
 
-    // WAIT FOR LOAD
-
-    audioPlayer.onloadedmetadata =
+    audioPlayer.onloadedmetadata=
     async ()=>{
 
-      audioPlayer.currentTime =
+      audioPlayer.currentTime=
       currentTime;
 
       if(!player.paused()){
@@ -315,15 +289,8 @@ async function loadAudio(audioObj){
       }
 
       logDebug(
-
         "Audio changed to: " +
-
         audioObj.lang
-
-      );
-
-      logDebug(
-        audioObj.url
       );
 
     };
@@ -333,35 +300,27 @@ async function loadAudio(audioObj){
   catch(error){
 
     logDebug(
-
       "Audio switch failed: " +
-
       error.message
-
     );
 
   }
 
 }
 
-
 // LANGUAGE SWITCH
 
 if(languageSelect){
 
   languageSelect.addEventListener(
-
     "change",
-
     ()=>{
 
-      const selected =
+      const selected=
       audioLinks.find(
-
         a =>
         a.url ===
         languageSelect.value
-
       );
 
       if(selected){
@@ -373,17 +332,13 @@ if(languageSelect){
       }
 
     }
-
   );
 
 }
 
-
 // SYNC ENGINE
 
 function setupSync(){
-
-  // PLAY
 
   player.on('play',()=>{
 
@@ -395,8 +350,6 @@ function setupSync(){
 
   });
 
-  // PAUSE
-
   player.on('pause',()=>{
 
     audioPlayer.pause();
@@ -407,11 +360,9 @@ function setupSync(){
 
   });
 
-  // SEEK
-
   player.on('seeking',()=>{
 
-    audioPlayer.currentTime =
+    audioPlayer.currentTime=
     player.currentTime();
 
     logDebug(
@@ -419,8 +370,6 @@ function setupSync(){
     );
 
   });
-
-  // BUFFER
 
   player.on('waiting',()=>{
 
@@ -432,8 +381,6 @@ function setupSync(){
 
   });
 
-  // PLAYING
-
   player.on('playing',()=>{
 
     audioPlayer.play();
@@ -444,22 +391,17 @@ function setupSync(){
 
   });
 
-  // AUTO RESYNC
-
   setInterval(()=>{
 
-    const diff =
+    const diff=
     Math.abs(
-
       player.currentTime() -
-
       audioPlayer.currentTime
-
     );
 
     if(diff > 0.5){
 
-      audioPlayer.currentTime =
+      audioPlayer.currentTime=
       player.currentTime();
 
       logDebug(
@@ -472,32 +414,25 @@ function setupSync(){
 
 }
 
-
 // TRACK CHECK
 
 function inspectTracks(){
 
   try{
 
-    const textTracks =
+    const textTracks=
     player.textTracks();
 
     logDebug(
-
       "TextTracks object: " +
-
       (!!textTracks)
-
     );
 
     if(textTracks){
 
       logDebug(
-
         "Subtitle track count: " +
-
         textTracks.length
-
       );
 
     }
@@ -507,17 +442,13 @@ function inspectTracks(){
   catch(error){
 
     logDebug(
-
       "Track inspection failed: " +
-
       error.message
-
     );
 
   }
 
 }
-
 
 // EVENTS
 
@@ -530,7 +461,6 @@ player.on('loadedmetadata',()=>{
   inspectTracks();
 
 });
-
 
 player.on('dispose',()=>{
 

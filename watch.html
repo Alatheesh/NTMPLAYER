@@ -87,6 +87,8 @@ Ultra smooth playback • Cinematic interface • Premium streaming
 
 <div class="player-card">
 
+<!-- LOADING -->
+
 <div
 class="loading-screen"
 id="loadingScreen"
@@ -100,6 +102,8 @@ Preparing Premium Stream...
 
 </div>
 
+<!-- VIDEO -->
+
 <video
 id="videoPlayer"
 class="video-js vjs-default-skin vjs-big-play-centered"
@@ -107,6 +111,38 @@ controls
 preload="auto"
 playsinline
 ></video>
+
+<!-- DOUBLE TAP ZONES -->
+
+<div
+class="tap-zone left-zone"
+id="leftZone"
+>
+
+<div
+class="tap-animation"
+id="leftAnim"
+>
+⏪ 10s
+</div>
+
+</div>
+
+<div
+class="tap-zone right-zone"
+id="rightZone"
+>
+
+<div
+class="tap-animation"
+id="rightAnim"
+>
+10s ⏩
+</div>
+
+</div>
+
+<!-- PREMIUM CONTROLS -->
 
 <div class="premium-controls">
 
@@ -210,7 +246,11 @@ you acknowledge and agree to this disclaimer.
 
 </section>
 
+<!-- VIDEO JS -->
+
 <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+
+<!-- JS -->
 
 <script src="watch.js"></script>
 

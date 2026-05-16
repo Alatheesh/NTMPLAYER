@@ -35,7 +35,7 @@ body{
     #0b0b0b
   );
 
-  z-index:-3;
+  z-index:-4;
 }
 
 .particles{
@@ -53,7 +53,30 @@ body{
   animation:
   particlesMove 18s linear infinite;
 
-  opacity:0.25;
+  opacity:0.2;
+
+  z-index:-3;
+}
+
+.ambient-light{
+  position:fixed;
+  width:700px;
+  height:700px;
+  border-radius:50%;
+
+  background:
+  radial-gradient(
+    rgba(0,123,255,0.14),
+    transparent 70%
+  );
+
+  top:-200px;
+  left:-200px;
+
+  filter:blur(40px);
+
+  animation:
+  ambientMove 12s ease infinite;
 
   z-index:-2;
 }
@@ -82,7 +105,7 @@ body{
 }
 
 .logo{
-  font-size:28px;
+  font-size:30px;
   font-weight:bold;
 
   background:
@@ -121,6 +144,9 @@ body{
   transition:0.3s;
 
   font-size:14px;
+
+  border:
+  1px solid rgba(255,255,255,0.06);
 }
 
 .top-btn:hover{
@@ -128,11 +154,11 @@ body{
 
   transform:
   translateY(-2px)
-  scale(1.04);
+  scale(1.05);
 
   box-shadow:
-  0 0 18px
-  rgba(0,123,255,0.4);
+  0 0 20px
+  rgba(0,123,255,0.45);
 }
 
 /* HERO */
@@ -140,11 +166,33 @@ body{
 .hero{
   width:100%;
   text-align:center;
-  padding:70px 20px 40px;
+  padding:90px 20px 50px;
+}
+
+.hero-badge{
+  display:inline-block;
+
+  padding:10px 18px;
+
+  border-radius:40px;
+
+  background:
+  rgba(255,255,255,0.06);
+
+  border:
+  1px solid rgba(255,255,255,0.08);
+
+  margin-bottom:25px;
+
+  color:#bbb;
+
+  font-size:13px;
+
+  backdrop-filter:blur(10px);
 }
 
 .hero h1{
-  font-size:54px;
+  font-size:58px;
   font-weight:bold;
 
   background:
@@ -162,8 +210,10 @@ body{
 }
 
 .hero p{
-  margin-top:16px;
+  margin-top:18px;
+
   color:#aaa;
+
   font-size:18px;
 
   animation:
@@ -181,9 +231,9 @@ body{
 
 .player-card{
   width:100%;
-  max-width:1250px;
+  max-width:1280px;
 
-  border-radius:26px;
+  border-radius:28px;
   overflow:hidden;
 
   background:
@@ -196,9 +246,19 @@ body{
 
   position:relative;
 
+  box-shadow:
+  0 0 60px rgba(0,0,0,0.5);
+
   animation:
   fadeUp 1s ease,
   ambientGlow 8s ease infinite;
+
+  transition:0.3s;
+}
+
+.player-card:hover{
+  transform:
+  scale(1.002);
 }
 
 /* VIDEO */
@@ -209,7 +269,35 @@ body{
   background:black;
 }
 
-/* PREMIUM VIDEO JS */
+/* LIVE BADGE */
+
+.live-badge{
+  position:absolute;
+  top:20px;
+  left:20px;
+
+  padding:10px 16px;
+
+  border-radius:40px;
+
+  background:
+  rgba(255,0,70,0.18);
+
+  border:
+  1px solid rgba(255,255,255,0.08);
+
+  backdrop-filter:blur(10px);
+
+  color:white;
+
+  font-size:12px;
+
+  letter-spacing:1px;
+
+  z-index:30;
+}
+
+/* VIDEO JS */
 
 .vjs-control-bar{
   background:
@@ -223,10 +311,10 @@ body{
 
   border-radius:50% !important;
 
-  width:95px !important;
-  height:95px !important;
+  width:100px !important;
+  height:100px !important;
 
-  line-height:95px !important;
+  line-height:100px !important;
 
   background:
   rgba(0,123,255,0.85) !important;
@@ -235,10 +323,10 @@ body{
 }
 
 .vjs-big-play-button:hover{
-  transform:scale(1.1);
+  transform:scale(1.12);
 }
 
-/* PREMIUM CONTROLS */
+/* CONTROLS */
 
 .premium-controls{
   width:100%;
@@ -250,7 +338,7 @@ body{
 
   gap:14px;
 
-  padding:22px;
+  padding:24px;
 
   background:
   rgba(0,0,0,0.55);
@@ -263,7 +351,7 @@ body{
   border:none;
   outline:none;
 
-  padding:13px 18px;
+  padding:13px 20px;
 
   border-radius:14px;
 
@@ -277,6 +365,9 @@ body{
   transition:0.3s;
 
   backdrop-filter:blur(10px);
+
+  border:
+  1px solid rgba(255,255,255,0.06);
 }
 
 .premium-btn:hover{
@@ -287,7 +378,7 @@ body{
   scale(1.04);
 
   box-shadow:
-  0 0 18px rgba(0,123,255,0.4);
+  0 0 20px rgba(0,123,255,0.4);
 }
 
 .speed-select{
@@ -302,22 +393,25 @@ body{
   rgba(255,255,255,0.08);
 
   color:white;
+
+  border:
+  1px solid rgba(255,255,255,0.06);
 }
 
 .speed-select option{
   background:#111;
 }
 
-/* LOADING SCREEN */
+/* LOADING */
 
 .loading-screen{
   position:absolute;
   inset:0;
 
   background:
-  rgba(0,0,0,0.78);
+  rgba(0,0,0,0.82);
 
-  backdrop-filter:blur(10px);
+  backdrop-filter:blur(12px);
 
   z-index:99;
 
@@ -329,7 +423,7 @@ body{
   gap:20px;
 }
 
-/* BUFFER LOADER */
+/* BUFFER */
 
 .buffer-loader{
   position:absolute;
@@ -359,8 +453,8 @@ body{
 
 .loader-ring,
 .buffer-spinner{
-  width:70px;
-  height:70px;
+  width:72px;
+  height:72px;
 
   border-radius:50%;
 
@@ -380,7 +474,7 @@ body{
   width:100%;
   display:flex;
   justify-content:center;
-  padding:60px 20px;
+  padding:70px 20px;
 }
 
 .disclaimer-card{
@@ -395,9 +489,9 @@ body{
 
   backdrop-filter:blur(14px);
 
-  border-radius:26px;
+  border-radius:30px;
 
-  padding:40px;
+  padding:50px;
 
   text-align:center;
 
@@ -406,20 +500,25 @@ body{
   color:#cfcfcf;
 
   box-shadow:
-  0 0 40px rgba(0,0,0,0.4);
+  0 0 50px rgba(0,0,0,0.45);
 
   animation:
   fadeUp 1.2s ease;
 }
 
+.disclaimer-icon{
+  font-size:42px;
+  margin-bottom:20px;
+}
+
 .disclaimer-card h2{
-  font-size:32px;
+  font-size:36px;
   margin-bottom:25px;
   color:#ffcc00;
 }
 
 .accept-line{
-  margin-top:25px;
+  margin-top:28px;
   color:#00ff88;
   font-weight:bold;
 }
@@ -432,7 +531,7 @@ body{
   text-align:center;
 
   padding:
-  30px 15px 45px;
+  40px 15px 55px;
 
   color:#777;
 
@@ -440,18 +539,57 @@ body{
 
   line-height:2;
 
-  opacity:0.85;
+  position:relative;
 }
 
 .footer-main{
   font-size:13px;
-  color:#999;
+  color:#aaa;
   letter-spacing:1px;
 }
 
 .footer-sub{
   margin-top:6px;
   color:#666;
+}
+
+.footer-links{
+  margin-top:18px;
+
+  display:flex;
+  justify-content:center;
+  gap:22px;
+
+  flex-wrap:wrap;
+}
+
+.footer-links a{
+  color:#888;
+  text-decoration:none;
+  transition:0.3s;
+}
+
+.footer-links a:hover{
+  color:#00bfff;
+}
+
+.footer-glow{
+  position:absolute;
+  width:300px;
+  height:100px;
+
+  background:
+  radial-gradient(
+    rgba(0,123,255,0.12),
+    transparent
+  );
+
+  left:50%;
+  transform:translateX(-50%);
+
+  bottom:0;
+
+  filter:blur(40px);
 }
 
 /* ANIMATIONS */
@@ -494,8 +632,6 @@ body{
 
 }
 
-/* AMBIENT GLOW */
-
 @keyframes ambientGlow{
 
   0%{
@@ -505,7 +641,7 @@ body{
 
   50%{
     box-shadow:
-    0 0 55px rgba(255,0,140,0.18);
+    0 0 70px rgba(255,0,140,0.18);
   }
 
   100%{
@@ -515,12 +651,32 @@ body{
 
 }
 
+@keyframes ambientMove{
+
+  0%{
+    transform:translate(0,0);
+  }
+
+  50%{
+    transform:translate(120px,80px);
+  }
+
+  100%{
+    transform:translate(0,0);
+  }
+
+}
+
 /* MOBILE */
 
 @media(max-width:768px){
 
+  .hero{
+    padding-top:60px;
+  }
+
   .hero h1{
-    font-size:32px;
+    font-size:34px;
   }
 
   .hero p{
@@ -556,7 +712,12 @@ body{
   }
 
   .disclaimer-card{
-    padding:25px;
+    padding:28px;
+  }
+
+  .live-badge{
+    font-size:10px;
+    padding:8px 12px;
   }
 
 }

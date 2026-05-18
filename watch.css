@@ -99,7 +99,7 @@ body{
 
   padding:18px 30px;
 
-  position:fixed;
+  position:absolute; /* CHANGED FROM FIXED TO ABSOLUTE */
   top:0;
   left:0;
 

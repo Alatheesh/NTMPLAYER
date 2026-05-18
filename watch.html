@@ -2,308 +2,101 @@
 <html lang="en">
 
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NTM Stream • Premium Streaming</title>
 
-<meta charset="UTF-8">
+  <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
 
-<meta
-name="viewport"
-content="width=device-width, initial-scale=1.0"
->
+  <link rel="stylesheet" href="watch.css" />
 
-<title>NTM Stream • Premium Streaming</title>
-
-<!-- VIDEO JS -->
-
-<link
-href="https://vjs.zencdn.net/8.10.0/video-js.css"
-rel="stylesheet"
-/>
-
-<!-- CSS -->
-
-<link
-rel="stylesheet"
-href="watch.css"
-/>
-
-<!-- FAVICON -->
-
-<link
-rel="icon"
-href="logo.png"
-/>
-
+  <link rel="icon" href="logo.png" />
 </head>
 
 <body>
 
-<!-- PREMIUM BACKGROUND -->
-
-<div class="bg-overlay"></div>
-
-<div class="particles"></div>
-
-<div class="ambient-light"></div>
-
-<!-- TOP BAR -->
-
-<header class="top-bar">
-
-<div class="logo">
-
-<img
-src="logo.png"
-class="logo-img"
->
-
-<span>
-NTM Stream
-</span>
-
-</div>
-
-<div class="top-actions">
-
-<button
-class="top-btn"
-onclick="copyStreamLink()"
->
-🔗 Copy Stream
-</button>
-
-<button
-class="top-btn"
-onclick="openExternalPlayer()"
->
-▶ Open in VLC
-</button>
-
-<button
-class="top-btn"
-onclick="history.back()"
->
-← Back
-</button>
-
-</div>
-
-</header>
-
-<!-- HERO -->
-
-<section class="hero">
-
-<div class="hero-badge">
-Premium Cinematic Streaming
-</div>
-
-<h1>
-Experience Streaming Like Never Before
-</h1>
-
-<p>
-Ultra smooth playback • Ambient glow • Cinematic experience • Premium interface
-</p>
-
-</section>
-
-<!-- PLAYER -->
-
-<section class="player-section">
-
-<div class="player-card">
-
-<!-- LOADING -->
-
-<div
-class="loading-screen"
-id="loadingScreen"
->
-
-<div class="loader-ring"></div>
-
-<p>
-Preparing Premium Stream...
-</p>
-
-</div>
-
-<!-- BUFFER -->
-
-<div
-class="buffer-loader"
-id="bufferLoader"
->
-
-<div class="buffer-spinner"></div>
-
-</div>
-
-<!-- VIDEO -->
-
-<video
-id="videoPlayer"
-class="video-js vjs-default-skin vjs-big-play-centered"
-controls
-preload="auto"
-playsinline
-></video>
-
-<!-- PLAYER BADGE -->
-
-<div class="live-badge">
-● PREMIUM STREAM
-</div>
-
-<!-- CONTROLS -->
-
-<div class="premium-controls">
-
-<button
-onclick="skipBackward()"
-class="premium-btn"
->
-⏪ 10s
-</button>
-
-<button
-onclick="togglePlay()"
-class="premium-btn"
->
-⏯ Play
-</button>
-
-<button
-onclick="skipForward()"
-class="premium-btn"
->
-10s ⏩
-</button>
-
-<select
-id="speedControl"
-class="speed-select"
->
-
-<option value="0.5">
-0.5x
-</option>
-
-<option value="1" selected>
-1x
-</option>
-
-<option value="1.25">
-1.25x
-</option>
-
-<option value="1.5">
-1.5x
-</option>
-
-<option value="2">
-2x
-</option>
-
-</select>
-
-</div>
-
-</div>
-
-</section>
-
-<!-- DISCLAIMER -->
-
-<section class="premium-disclaimer">
-
-<div class="disclaimer-card">
-
-<div class="disclaimer-icon">
-⚠
-</div>
-
-<h2>
-Streaming Disclaimer
-</h2>
-
-<p>
-NTM Stream functions solely as a search
-and indexing interface for publicly available
-third-party content across the internet.
-</p>
-
-<p>
-We do not host, upload, archive,
-store, distribute, or modify any
-media content on our own servers.
-</p>
-
-<p>
-All streaming content displayed on
-this platform originates from
-external providers beyond our control.
-</p>
-
-<p>
-Users are fully responsible for ensuring
-their use of this website complies with
-their local laws and regulations.
-</p>
-
-<p class="accept-line">
-By continuing to access this platform,
-you acknowledge and agree to this disclaimer.
-</p>
-
-</div>
-
-</section>
-
-<!-- FOOTER -->
-
-<footer class="premium-footer">
-
-<div class="footer-glow"></div>
-
-<p class="footer-main">
-© 2026 NTM Stream • All Rights Reserved
-</p>
-
-<p class="footer-sub">
-Premium cinematic streaming experience
-designed for entertainment purposes only.
-</p>
-
-<div class="footer-links">
-
-<a href="disclaimer.html">
-Disclaimer
-</a>
-
-<a href="privacy.html">
-Privacy Policy
-</a>
-
-<a href="terms.html">
-Terms of Service
-</a>
-
-<a href="dmca.html">
-DCMA 
-</a>
-
-</div>
-
-</footer>
-
-<!-- VIDEO JS -->
-
-<script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
-
-<!-- PLAYER SCRIPT -->
-
-<script src="watch.js"></script>
+  <div class="bg-overlay"></div>
+  <div class="particles"></div>
+  <div class="ambient-light"></div>
+
+  <header class="top-bar">
+    <div class="logo">
+      <img src="logo.png" class="logo-img">
+      <span>NTM Stream</span>
+    </div>
+    <div class="top-actions">
+      <button class="top-btn" onclick="copyStreamLink()">🔗 Copy Stream</button>
+      <button class="top-btn" onclick="openExternalPlayer()">▶ Open in VLC</button>
+      <button class="top-btn" onclick="history.back()">← Back</button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-badge">Premium Cinematic Streaming</div>
+    <h1>Experience Streaming Like Never Before</h1>
+    
+    <div class="cinematic-blade"></div>
+  </section>
+
+  <section class="player-section">
+    <div class="player-card">
+
+      <div class="loading-screen" id="loadingScreen">
+        <div class="loader-ring"></div>
+        <p>Preparing Premium Stream...</p>
+      </div>
+
+      <div class="buffer-loader" id="bufferLoader">
+        <div class="buffer-spinner"></div>
+      </div>
+
+      <video id="videoPlayer" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto" playsinline></video>
+
+      <div class="live-badge">● PREMIUM STREAM</div>
+
+      <div class="premium-controls">
+        <button onclick="skipBackward()" class="premium-btn">⏪ 10s</button>
+        <button onclick="togglePlay()" class="premium-btn">⏯ Play</button>
+        <button onclick="skipForward()" class="premium-btn">10s ⏩</button>
+        <select id="speedControl" class="speed-select">
+          <option value="0.5">0.5x</option>
+          <option value="1" selected>1x</option>
+          <option value="1.25">1.25x</option>
+          <option value="1.5">1.5x</option>
+          <option value="2">2x</option>
+        </select>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="premium-disclaimer">
+    <div class="disclaimer-card">
+      <div class="disclaimer-icon">⚠</div>
+      <h2>Streaming Disclaimer</h2>
+      <p>NTM Stream functions solely as a search and indexing interface for publicly available third-party content across the internet.</p>
+      <p>We do not host, upload, archive, store, distribute, or modify any media content on our own servers.</p>
+      <p>All streaming content displayed on this platform originates from external providers beyond our control.</p>
+      <p>Users are fully responsible for ensuring their use of this website complies with their local laws and regulations.</p>
+      <p class="accept-line">By continuing to access this platform, you acknowledge and agree to this disclaimer.</p>
+    </div>
+  </section>
+
+  <footer class="premium-footer">
+    <div class="footer-glow"></div>
+    <p class="footer-main">© 2026 NTM Stream • All Rights Reserved</p>
+    <p class="footer-sub">Premium cinematic streaming experience designed for entertainment purposes only.</p>
+    <div class="footer-links">
+      <a href="disclaimer.html">Disclaimer</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms of Service</a>
+      <a href="dmca.html">DCMA</a>
+    </div>
+  </footer>
+
+  <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+
+  <script src="watch.js"></script>
 
 </body>
 </html>

@@ -21,7 +21,7 @@
 
   <header class="top-bar">
     <div class="logo">
-      <img src="logo.png" class="logo-img">
+      <img src="logo.png" class="logo-img" alt="Logo">
       <span>NTM Stream</span>
     </div>
     <div class="top-actions">
@@ -34,12 +34,11 @@
   <section class="hero">
     <div class="hero-badge">Premium Cinematic Streaming</div>
     <h1>Experience Streaming Like Never Before</h1>
-    
     <div class="cinematic-blade"></div>
   </section>
 
   <section class="player-section">
-    <div class="player-card">
+    <div class="player-card" id="playerCardContainer">
 
       <div class="loading-screen" id="loadingScreen">
         <div class="loader-ring"></div>
@@ -50,9 +49,17 @@
         <div class="buffer-spinner"></div>
       </div>
 
-      <video id="videoPlayer" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto" playsinline></video>
+      <video 
+        id="videoPlayer" 
+        class="video-js vjs-default-skin vjs-big-play-centered" 
+        controls 
+        preload="auto" 
+        playsinline
+        webkit-playsinline
+        x5-playsinline>
+      </video>
 
-      <div class="live-badge">● PREMIUM STREAM</div>
+      <div class="live-badge" id="liveBadge">● PREMIUM STREAM</div>
 
       <div class="premium-controls">
         <button onclick="decreaseVolume()" class="premium-btn">🔉 Vol -</button>

@@ -16,6 +16,9 @@ const playBtn = document.getElementById("playPauseBtn");
 const playerCardContainer = document.getElementById("playerCardContainer");
 const liveBadge = document.getElementById("liveBadge");
 
+// Native Video Element Hook for WebView stability
+const nativeVideo = document.getElementById("videoPlayer_html5_api") || document.querySelector("#videoPlayer video");
+
 let badgeTimeout;
 
 // ---------------- START STREAMING ----------------
@@ -30,7 +33,6 @@ function startStreaming() {
 
   let type = "video/mp4";
 
-  // STREAM TYPE
   if (link.includes(".m3u8")) {
     type = "application/x-mpegURL";
   }
@@ -41,7 +43,6 @@ function startStreaming() {
     type = "video/x-matroska";
   }
 
-  // LOAD PLAYER
   player.src({
     src: link,
     type: type
@@ -64,14 +65,12 @@ function togglePlay() {
 function increaseVolume() {
   let currentVol = player.volume();
   player.volume(Math.min(currentVol + 0.1, 1.0));
-  
   showToast("Volume: " + Math.round(player.volume() * 100) + "%");
 }
 
 function decreaseVolume() {
   let currentVol = player.volume();
   player.volume(Math.max(currentVol - 0.1, 0.0));
-  
   showToast("Volume: " + Math.round(player.volume() * 100) + "%");
 }
 
@@ -88,46 +87,94 @@ function skipBackward() {
   showToast("-10 Seconds");
 }
 
-// ---------------- FULLSCREEN CONTROL & MOBILE FALLBACK ----------------
+// ---------------- HARD FORCED TELEGRAM FULLSCREEN & PiP WORKAROUND ----------------
 function toggleFullscreen() {
   if (!playerCardContainer) return;
 
-  // Check if standard browser supports native element fullscreen tracking
-  if (!player.isFullscreen()) {
+  // Force Telegram mobile to toggle the Web-Fullscreen CSS override directly
+  const isWebFS = playerCardContainer.classList.contains("web-fullscreen");
+  
+  if (!isWebFS) {
+    playerCardContainer.classList.add("web-fullscreen");
+    showToast("Web Fullscreen Enabled");
+    
+    // Attempt native fullscreen backup call simultaneously
     if (playerCardContainer.requestFullscreen) {
-      playerCardContainer.requestFullscreen();
-    } else if (playerCardContainer.webkitRequestFullscreen) { /* Safari/iOS Mobile */
-      playerCardContainer.webkitRequestFullscreen();
-    } else {
-      // WebView Fallback Framework implementation for restrictive layers (Telegram App)
-      playerCardContainer.classList.toggle("web-fullscreen");
+      playerCardContainer.requestFullscreen().catch(() => {});
+    } else if (playerCardContainer.webkitRequestFullscreen) {
+      playerCardContainer.webkitRequestFullscreen().catch(() => {});
     }
   } else {
-    player.exitFullscreen();
+    playerCardContainer.classList.remove("web-fullscreen");
+    if (document.exitFullscreen) {
+      document.exitFullscreen().catch(() => {});
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen().catch(() => {});
+    }
   }
 }
 
-// Intercept clicks directly inside the custom control bar to enforce alternative mobile styling
-player.on('fullscreenchange', () => {
-  if (!player.isFullscreen()) {
-    // Scrub alternative view overrides if exit flags are encountered
-    playerCardContainer.classList.remove("web-fullscreen");
+// NATIVE PICTURE-IN-PICTURE (PiP) FORCE FOR MOBILE
+async function togglePiP() {
+  if (!nativeVideo) return;
+  
+  try {
+    if (document.pictureInPictureElement) {
+      await document.exitPictureInPicture();
+    } else if (document.pictureInPictureEnabled || nativeVideo.webkitSupportsPresentationMode) {
+      if (nativeVideo.requestPictureInPicture) {
+        await nativeVideo.requestPictureInPicture();
+      } else if (nativeVideo.webkitSetPresentationMode) {
+        // Fallback for iOS/Safari WebViews inside apps
+        nativeVideo.webkitSetPresentationMode(nativeVideo.webkitPresentationMode === "picture-in-picture" ? "inline" : "picture-in-picture");
+      }
+    } else {
+      showToast("PiP not supported by this app browser");
+    }
+  } catch (error) {
+    console.error("PiP Error:", error);
+    // If native PiP crashes inside Telegram, fallback to a compact floating side-view look
+    playerCardContainer.classList.toggle("web-fullscreen");
   }
-});
+}
 
-// ---------------- DYNAMIC BADGE FADE LOGIC ----------------
-function showAndQueueFadeBadge() {
+// ---------------- HARD BADGE FADE LOGIC (NATIVE TRIGGER) ----------------
+function hideBadge() {
   if (!liveBadge) return;
-  
   clearTimeout(badgeTimeout);
-  liveBadge.classList.remove("hidden"); // Instantly unhide asset
   
-  // Sets countdown execution logic to fade away cleanly after 3 seconds
   badgeTimeout = setTimeout(() => {
-    if (!player.paused()) {
+    // Check native element state to make sure it didn't pause during the 3 seconds
+    const isPaused = nativeVideo ? nativeVideo.paused : player.paused();
+    if (!isPaused) {
       liveBadge.classList.add("hidden");
     }
   }, 3000);
+}
+
+function showBadge() {
+  if (!liveBadge) return;
+  clearTimeout(badgeTimeout);
+  liveBadge.classList.remove("hidden");
+}
+
+// HOOK DIRECTLY TO NATIVE LAUNCH EVENTS (Bypasses Video.js abstraction drops)
+if (nativeVideo) {
+  nativeVideo.addEventListener("play", () => {
+    if (playBtn) playBtn.innerHTML = "⏸ Pause";
+    showBadge();
+    hideBadge();
+  });
+
+  nativeVideo.addEventListener("pause", () => {
+    if (playBtn) playBtn.innerHTML = "⏯ Play";
+    showBadge();
+  });
+
+  nativeVideo.addEventListener("seeking", () => {
+    showBadge();
+    hideBadge();
+  });
 }
 
 // ---------------- PLAYBACK SPEED ----------------
@@ -139,7 +186,7 @@ if (speedControl) {
   });
 }
 
-// ---------------- UTILITY ACCELERATORS ----------------
+// ---------------- UTILITY CONTROLS ----------------
 function copyStreamLink() {
   navigator.clipboard.writeText(location.href);
   showToast("Stream link copied");
@@ -151,10 +198,12 @@ function openExternalPlayer() {
   if (link) window.open(link);
 }
 
-// ---------------- PLAYER EVENT CONTROLLERS ----------------
+// ---------------- PLAYER RENDERING LIFE EVENTS ----------------
 player.on('loadedmetadata', () => {
   if (loadingScreen) loadingScreen.style.display = "none";
   showToast("Premium Stream Ready");
+  // Queue baseline badge fade out right at startup if autoplay triggers
+  hideBadge();
 });
 
 player.on("waiting", () => {
@@ -165,27 +214,13 @@ player.on("playing", () => {
   if (bufferLoader) bufferLoader.classList.remove("show");
 });
 
-// Player Hook Actions mapped directly to tracking overlay components
-player.on("play", () => {
-  if (playBtn) playBtn.innerHTML = "⏸ Pause";
-  showAndQueueFadeBadge();
-});
-
-player.on("pause", () => {
-  if (playBtn) playBtn.innerHTML = "⏯ Play";
-  if (liveBadge) liveBadge.classList.remove("hidden"); // Always unhide badge when paused
-});
-
-player.on("seeking", showAndQueueFadeBadge);
-
 player.on("ended", () => {
   showToast("Playback Finished");
-  if (liveBadge) liveBadge.classList.remove("hidden");
+  showBadge();
 });
 
 // ---------------- KEYBOARD SHORTCUTS ----------------
 document.addEventListener("keydown", (e) => {
-  // If user is focused inside input elements, don't execute player shortcuts
   if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'SELECT') return;
 
   if (e.code === "Space") {
@@ -212,46 +247,38 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
-// ---------------- VISUAL TRANSFORM ACCELERATOR ----------------
 function pulsePlayer() {
   if (!playerCardContainer) return;
   playerCardContainer.style.transform = "scale(1.005)";
-  setTimeout(() => {
-    playerCardContainer.style.transform = "scale(1)";
-  }, 150);
+  setTimeout(() => { playerCardContainer.style.transform = "scale(1)"; }, 150);
 }
 
-// ---------------- PREMIUM TOAST INJECTOR ----------------
 function showToast(text) {
-  const toast = document.createElement("div");
-  toast.innerText = text;
+  const oldToast = document.querySelector(".custom-toast");
+  if (oldToast) oldToast.remove();
 
+  const toast = document.createElement("div");
+  toast.className = "custom-toast";
+  toast.innerText = text;
   toast.style.position = "fixed";
   toast.style.bottom = "30px";
   toast.style.left = "50%";
   toast.style.transform = "translateX(-50%)";
   toast.style.padding = "14px 22px";
   toast.style.borderRadius = "14px";
-  toast.style.background = "rgba(0,0,0,0.72)";
+  toast.style.background = "rgba(0,0,0,0.85)";
   toast.style.backdropFilter = "blur(10px)";
   toast.style.webkitBackdropFilter = "blur(10px)";
   toast.style.color = "white";
-  toast.style.zIndex = "99999";
+  toast.style.zIndex = "999999";
   toast.style.fontSize = "14px";
-  toast.style.boxShadow = "0 0 25px rgba(0,0,0,0.5)";
+  toast.style.boxShadow = "0 4px 20px rgba(0,0,0,0.5)";
   toast.style.pointerEvents = "none";
-  toast.style.transition = "opacity 0.4s ease";
+  toast.style.transition = "opacity 0.3s ease";
 
   document.body.appendChild(toast);
-
-  setTimeout(() => {
-    toast.style.opacity = "0";
-  }, 1200);
-
-  setTimeout(() => {
-    toast.remove();
-  }, 1600);
+  setTimeout(() => { toast.style.opacity = "0"; }, 1200);
+  setTimeout(() => { toast.remove(); }, 1500);
 }
 
-// ---------------- AUTO RUN ----------------
 window.addEventListener("DOMContentLoaded", startStreaming);

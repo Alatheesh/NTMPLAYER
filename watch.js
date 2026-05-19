@@ -207,10 +207,34 @@ function copyStreamLink() {
   showToast("Stream link copied");
 }
 
-function openExternalPlayer() {
+// ---------------- MX PLAYER DEEP LINK ROUTING ----------------
+function openInMXPlayer() {
   const params = new URLSearchParams(location.search);
   const link = params.get("link");
-  if (link) window.open(link);
+  
+  if (!link) {
+    showToast("No stream link found");
+    return;
+  }
+
+  // Detect if the user is on an Android device
+  const isAndroid = /Android/i.test(navigator.userAgent);
+
+  if (isAndroid) {
+    // Strips http/https to properly format the Android OS Intent
+    const cleanLink = link.replace(/^https?:\/\//, '');
+    const scheme = link.startsWith('https') ? 'https' : 'http';
+    
+    // Forces Android to route the link directly into the MX Player app package
+    const mxIntent = `intent://${cleanLink}#Intent;scheme=${scheme};package=com.mxtech.videoplayer.ad;end;`;
+    
+    showToast("Launching MX Player...");
+    window.location.href = mxIntent;
+  } else {
+    // Fallback if the user clicks this on a Desktop/Laptop PC
+    showToast("MX Player app is for Android. Opening in browser...");
+    window.open(link, "_blank");
+  }
 }
 
 // ---------------- HOOK LOAD LIFECYCLES ----------------

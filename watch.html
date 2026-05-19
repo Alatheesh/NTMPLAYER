@@ -64,14 +64,14 @@
         <button onclick="skipBackward()" class="premium-btn">⏪ 10s</button>
         
         <button id="playPauseBtn" onclick="togglePlay()" class="premium-btn">⏯ Play</button>
-        
         <button onclick="toggleFullscreen()" class="premium-btn">🔲 Fullscreen</button>
-        <button onclick="togglePiP()" class="premium-btn">📺 Picture in Picture</button>
         
         <button onclick="skipForward()" class="premium-btn">10s ⏩</button>
         <button onclick="increaseVolume()" class="premium-btn">🔊 Vol +</button>
         
-        <select id="speedControl" class="speed-select">
+        <button onclick="togglePiP()" class="premium-btn" style="grid-column: span 3;">📺 Picture in Picture</button>
+        
+        <select id="speedControl" class="speed-select" style="grid-column: span 3;">
           <option value="0.5">0.5x</option>
           <option value="1" selected>1x</option>
           <option value="1.25">1.25x</option>

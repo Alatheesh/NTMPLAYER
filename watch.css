@@ -201,13 +201,13 @@ body {
 }
 
 .player-card:hover {
-  transform: translateY(-8px) scale(1.01);
+  transform: translateY(-4px) scale(1.005);
   box-shadow: 
     0 20px 80px rgba(0, 191, 255, 0.25), 
     0 0 40px rgba(141, 124, 255, 0.15);
 }
 
-/* 🔥 CRITICAL CRUNCH OVERRIDE SYSTEM: TELEGRAM IN-APP FULLSCREEN FALLBACK */
+/* TELEGRAM IN-APP FULLSCREEN FALLBACK SYSTEM OVERRIDES */
 .player-card.web-fullscreen {
   position: fixed !important;
   top: 0 !important;
@@ -224,7 +224,11 @@ body {
 }
 
 .player-card.web-fullscreen .video-js {
-  height: calc(100dvh - 90px) !important; /* Subtracts room for control docks on viewport scaling handles */
+  height: calc(100dvh - 110px) !important; /* Dynamically resizes view to account for grid rows */
+}
+
+.player-card.web-fullscreen .premium-controls {
+  border-radius: 0 !important;
 }
 
 .video-js {
@@ -234,7 +238,7 @@ body {
   border-radius: 28px 28px 0 0;
 }
 
-/* VIDEO JS DOCK OVERLAY COMPLIANCE CUSTOMIZATION */
+/* VIDEO JS DOCK OVERLAY COMPLIANCE */
 .vjs-control-bar {
   background: rgba(0,0,0,0.72) !important;
   backdrop-filter: blur(12px);
@@ -249,34 +253,78 @@ body {
   background: rgba(0,160,255,0.85) !important;
 }
 
-/* DYNAMIC BUTTON CLUSTERS CONTROLS PANEL */
+/* 🔥 PREMIUM CONTROLS DOCK - GRID SYMMETRY UPGRADE */
 .premium-controls {
   width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 14px;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr); /* Creates 6 balanced visual grid tracks */
+  gap: 12px;
   padding: 24px;
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(4, 6, 12, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 0 0 28px 28px;
 }
 
+/* INTERACTIVE CORE CONTROLS LAYOUT */
 .premium-btn,
 .speed-select {
+  width: 100%;
+  height: 48px;
   border: none;
   outline: none;
-  padding: 13px 20px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.08);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
   color: white;
   cursor: pointer;
-  transition: 0.3s;
-  backdrop-filter: blur(10px);
+  
+  /* Frosted Glass Treatment Layer */
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-/* LOADING MASK ELEMENTS GRID INITIALIZATION SETUP */
+/* Speed Custom Dropdown Configuration Layout bounds */
+.speed-select {
+  appearance: none;
+  -webkit-appearance: none;
+  text-align: center;
+  padding-left: 10px;
+}
+
+.speed-select option {
+  background: #070b14;
+  color: white;
+}
+
+/* TRANSITION ACCELERATIONS FOR GENERAL SHORTCUT HOVERS */
+.premium-btn:hover,
+.speed-select:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+/* 🔥 SPECIAL EMBEDDED CORES (Main Priority Accent Buttons) */
+#playPauseBtn {
+  background: linear-gradient(135deg, #007bff, #00bfff) !important;
+  border: none !important;
+  box-shadow: 0 4px 15px rgba(0, 191, 255, 0.3);
+}
+
+#playPauseBtn:hover {
+  box-shadow: 0 6px 20px rgba(0, 191, 255, 0.5);
+  transform: translateY(-2px) scale(1.02);
+}
+
+/* LOADING MASK SHIELD INITIALIZATION MAPS */
 .loading-screen,
 .buffer-loader {
   position: absolute;
@@ -311,7 +359,7 @@ body {
   animation: spin 1s linear infinite;
 }
 
-/* LEGAL SHIELD COMPONENT DESIGN STYLE */
+/* SHIELD DISCLAIMER CARD BOX TEXT */
 .premium-disclaimer {
   width: 100%;
   display: flex;
@@ -332,7 +380,7 @@ body {
   color: #cfcfcf;
 }
 
-/* SYSTEM WIDE GLOW FOOTER MATRICES ELEMENTS DESIGN */
+/* FOOTER BRAND REGISTRY FRAMEWORK */
 .premium-footer {
   width: 100%;
   text-align: center;
@@ -341,7 +389,7 @@ body {
   line-height: 2;
 }
 
-/* 🔥 LIVE OVERLAY BADGE (FADES SMOOTHLY VIA JS HOOKS) */
+/* 🔥 BRAND STATUS RADIAL BADGE */
 .live-badge {
   position: absolute;
   top: 20px;
@@ -355,27 +403,17 @@ body {
   color: white;
   font-size: 12px;
   z-index: 30;
-  pointer-events: none; /* Stops item from blocking click events underneath */
+  pointer-events: none;
   
-  /* Smooth Fade Transitions */
   opacity: 1;
   transition: opacity 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
   animation: pulseGlow 2s infinite;
 }
 
-/* Dynamic Hidden Class Triggered via watch.js script operations */
 .live-badge.hidden {
   opacity: 0 !important;
 }
 
-/* QUICK PREMIUM BUTTON TRANSITIONS INTERACTIONS MOUSEOVER HOVERS RULES */
-.premium-btn:hover {
-  background: #00aaff;
-  transform: translateY(-2px) scale(1.04);
-  box-shadow: 0 0 20px rgba(0,170,255,0.35);
-}
-
-/* MATRIX BRAND CORE GLOW SEQUENCER FOOTER ANCHORS DESIGN */
 .footer-links {
   margin-top: 18px;
   display: flex;
@@ -400,7 +438,7 @@ body {
   box-shadow: 0 0 35px rgba(0,190,255,0.28), 0 0 80px rgba(0,120,255,0.14);
 }
 
-/* SYSTEM ROTATION SPEED CYCLES TIMING KEYFRAMES LISTINGS SETUP */
+/* SYSTEM TIME LOOPS SEQUENCING KEYFRAMES */
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
@@ -451,7 +489,35 @@ body {
   100% { box-shadow: 0 0 10px rgba(0,170,255,0.2); }
 }
 
-/* RESPONSIVE FLUID MEDIA VIEWPORT ADAPTATION ADJUSTMENTS LAYOUT FOR PHONES */
+.hero-badge {
+  display: inline-block;
+  padding: 10px 18px;
+  border-radius: 40px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 25px;
+  color: #bbb;
+  font-size: 13px;
+  backdrop-filter: blur(10px);
+}
+
+/* 📱 HIGHLY RESPONSIVE PHONE LAYOUT MATRIX BREAKPOINTS */
+@media(max-width:900px) {
+  .premium-controls {
+    grid-template-columns: repeat(3, 1fr); /* Snaps dashboard grid to clean 3-column rows */
+    gap: 10px;
+    padding: 16px;
+    border-radius: 0 0 20px 20px;
+  }
+  
+  .premium-btn,
+  .speed-select {
+    height: 44px;
+    font-size: 13px;
+    border-radius: 10px;
+  }
+}
+
 @media(max-width:768px) {
   body {
     padding-top: 140px;
@@ -490,23 +556,18 @@ body {
     font-size: 14px;
   }
 
-  /* Video engine frame bounds resizing scaling optimization on phone displays */
   .video-js {
     height: 240px;
   }
 
-  /* Fullscreen container adaptation metrics layout tracking adjustments on phones */
+  /* Fullscreen Viewport calculation overrides inside WebView sandboxes */
   .player-card.web-fullscreen .video-js {
-    height: calc(100dvh - 120px) !important;
+    height: calc(100dvh - 140px) !important;
   }
+}
 
+@media(max-width:480px) {
   .premium-controls {
-    gap: 10px;
-    border-radius: 0 0 20px 20px;
-  }
-
-  .premium-btn {
-    font-size: 12px;
-    padding: 10px 12px;
+    grid-template-columns: repeat(2, 1fr); /* Snaps column structures cleanly to dual pairings on tight touch screens */
   }
 }

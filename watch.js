@@ -16,9 +16,6 @@ const playBtn = document.getElementById("playPauseBtn");
 const playerCardContainer = document.getElementById("playerCardContainer");
 const liveBadge = document.getElementById("liveBadge");
 
-// Native Video Element Hook for WebView stability
-const nativeVideo = document.getElementById("videoPlayer_html5_api") || document.querySelector("#videoPlayer video");
-
 let badgeTimeout;
 
 // ---------------- START STREAMING ----------------
@@ -87,18 +84,18 @@ function skipBackward() {
   showToast("-10 Seconds");
 }
 
-// ---------------- HARD FORCED TELEGRAM FULLSCREEN & PiP WORKAROUND ----------------
+// ---------------- HARD FORCED WEB-FULLSCREEN OVERRIDE ----------------
 function toggleFullscreen() {
   if (!playerCardContainer) return;
 
-  // Force Telegram mobile to toggle the Web-Fullscreen CSS override directly
+  // Telegram mobile ignores native hardware requests, so we toggle our CSS override immediately
   const isWebFS = playerCardContainer.classList.contains("web-fullscreen");
   
   if (!isWebFS) {
     playerCardContainer.classList.add("web-fullscreen");
     showToast("Web Fullscreen Enabled");
     
-    // Attempt native fullscreen backup call simultaneously
+    // Also try standard requests as a background backup measure
     if (playerCardContainer.requestFullscreen) {
       playerCardContainer.requestFullscreen().catch(() => {});
     } else if (playerCardContainer.webkitRequestFullscreen) {
@@ -114,39 +111,42 @@ function toggleFullscreen() {
   }
 }
 
-// NATIVE PICTURE-IN-PICTURE (PiP) FORCE FOR MOBILE
+// FORCE PICTURE-IN-PICTURE (PiP) THROUGH VIDEO.JS INSTANCE
 async function togglePiP() {
-  if (!nativeVideo) return;
+  // Get the native element directly from Video.js technical container mapping
+  const techVideo = player.tech({ IWillNotUseThisInApp: true }) ? player.tech().el_ : null;
+  
+  if (!techVideo) {
+    showToast("Video tech layer loading...");
+    return;
+  }
   
   try {
     if (document.pictureInPictureElement) {
       await document.exitPictureInPicture();
-    } else if (document.pictureInPictureEnabled || nativeVideo.webkitSupportsPresentationMode) {
-      if (nativeVideo.requestPictureInPicture) {
-        await nativeVideo.requestPictureInPicture();
-      } else if (nativeVideo.webkitSetPresentationMode) {
-        // Fallback for iOS/Safari WebViews inside apps
-        nativeVideo.webkitSetPresentationMode(nativeVideo.webkitPresentationMode === "picture-in-picture" ? "inline" : "picture-in-picture");
-      }
+    } else if (document.pictureInPictureEnabled) {
+      await techVideo.requestPictureInPicture();
+    } else if (techVideo.webkitSetPresentationMode) {
+      // iOS / In-App WebView presenter mode alternative fallback routing
+      techVideo.webkitSetPresentationMode(techVideo.webkitPresentationMode === "picture-in-picture" ? "inline" : "picture-in-picture");
     } else {
-      showToast("PiP not supported by this app browser");
+      showToast("PiP restricted by this mobile app environment");
     }
   } catch (error) {
-    console.error("PiP Error:", error);
-    // If native PiP crashes inside Telegram, fallback to a compact floating side-view look
+    console.error("PiP Failure:", error);
+    // If native system window fails inside Telegram sandbox, treat PiP as a layout fallback maximize step
     playerCardContainer.classList.toggle("web-fullscreen");
   }
 }
 
-// ---------------- HARD BADGE FADE LOGIC (NATIVE TRIGGER) ----------------
-function hideBadge() {
+// ---------------- RELIABLE BADGE TIMER TIMEOUTS ----------------
+function hideBadgeAfterDelay() {
   if (!liveBadge) return;
   clearTimeout(badgeTimeout);
   
   badgeTimeout = setTimeout(() => {
-    // Check native element state to make sure it didn't pause during the 3 seconds
-    const isPaused = nativeVideo ? nativeVideo.paused : player.paused();
-    if (!isPaused) {
+    // Check Video.js tracking instance status safely
+    if (!player.paused()) {
       liveBadge.classList.add("hidden");
     }
   }, 3000);
@@ -158,24 +158,28 @@ function showBadge() {
   liveBadge.classList.remove("hidden");
 }
 
-// HOOK DIRECTLY TO NATIVE LAUNCH EVENTS (Bypasses Video.js abstraction drops)
-if (nativeVideo) {
-  nativeVideo.addEventListener("play", () => {
-    if (playBtn) playBtn.innerHTML = "⏸ Pause";
-    showBadge();
-    hideBadge();
-  });
+// Tying stability events straight to Player abstraction instance handlers
+player.on("play", () => {
+  if (playBtn) playBtn.innerHTML = "⏸ Pause";
+  showBadge();
+  hideBadgeAfterDelay();
+});
 
-  nativeVideo.addEventListener("pause", () => {
-    if (playBtn) playBtn.innerHTML = "⏯ Play";
-    showBadge();
-  });
+player.on("pause", () => {
+  if (playBtn) playBtn.innerHTML = "⏯ Play";
+  showBadge();
+});
 
-  nativeVideo.addEventListener("seeking", () => {
-    showBadge();
-    hideBadge();
-  });
-}
+player.on("seeking", () => {
+  showBadge();
+  hideBadgeAfterDelay();
+});
+
+player.on("fullscreenchange", () => {
+  if (!player.isFullscreen()) {
+    playerCardContainer.classList.remove("web-fullscreen");
+  }
+});
 
 // ---------------- PLAYBACK SPEED ----------------
 const speedControl = document.getElementById("speedControl");
@@ -198,12 +202,11 @@ function openExternalPlayer() {
   if (link) window.open(link);
 }
 
-// ---------------- PLAYER RENDERING LIFE EVENTS ----------------
+// ---------------- HOOK LOAD LIFECYCLES ----------------
 player.on('loadedmetadata', () => {
   if (loadingScreen) loadingScreen.style.display = "none";
   showToast("Premium Stream Ready");
-  // Queue baseline badge fade out right at startup if autoplay triggers
-  hideBadge();
+  hideBadgeAfterDelay();
 });
 
 player.on("waiting", () => {

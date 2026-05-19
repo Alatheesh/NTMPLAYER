@@ -221,17 +221,28 @@ function openInMXPlayer() {
   const isAndroid = /Android/i.test(navigator.userAgent);
 
   if (isAndroid) {
-    // Strips http/https to properly format the Android OS Intent
     const cleanLink = link.replace(/^https?:\/\//, '');
     const scheme = link.startsWith('https') ? 'https' : 'http';
     
-    // Forces Android to route the link directly into the MX Player app package
-    const mxIntent = `intent://${cleanLink}#Intent;scheme=${scheme};package=com.mxtech.videoplayer.ad;end;`;
+    // Upgraded Intent with Action View and Play Store Fallback
+    const mxIntent = `intent://${cleanLink}#Intent;scheme=${scheme};package=com.mxtech.videoplayer.ad;action=android.intent.action.VIEW;S.browser_fallback_url=https://play.google.com/store/apps/details?id=com.mxtech.videoplayer.ad;end;`;
     
     showToast("Launching MX Player...");
-    window.location.href = mxIntent;
+    
+    // Telegram WebView Bypass: Create a hidden physical link and force-click it
+    const hiddenLink = document.createElement("a");
+    hiddenLink.href = mxIntent;
+    hiddenLink.style.display = "none";
+    document.body.appendChild(hiddenLink);
+    
+    hiddenLink.click(); // Simulates a real user tap to bypass security blocks
+    
+    // Clean up the fake link after clicking
+    setTimeout(() => {
+      document.body.removeChild(hiddenLink);
+    }, 500);
+
   } else {
-    // Fallback if the user clicks this on a Desktop/Laptop PC
     showToast("MX Player app is for Android. Opening in browser...");
     window.open(link, "_blank");
   }

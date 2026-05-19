@@ -1,391 +1,257 @@
-const player=
-videojs(
+const player = videojs(
   'videoPlayer',
   {
-    controls:true,
-    autoplay:false,
-    preload:'auto',
-    fluid:true,
-    responsive:true
+    controls: true,
+    autoplay: false,
+    preload: 'auto',
+    fluid: true,
+    responsive: true
   }
 );
 
 // ELEMENTS
-const loadingScreen=
-document.getElementById(
-  "loadingScreen"
-);
+const loadingScreen = document.getElementById("loadingScreen");
+const bufferLoader = document.getElementById("bufferLoader");
+const playBtn = document.getElementById("playPauseBtn");
+const playerCardContainer = document.getElementById("playerCardContainer");
+const liveBadge = document.getElementById("liveBadge");
 
-const bufferLoader=
-document.getElementById(
-  "bufferLoader"
-);
+let badgeTimeout;
 
-// Grab the play button so we can change its text
-const playBtn=
-document.getElementById(
-  "playPauseBtn"
-);
+// ---------------- START STREAMING ----------------
+function startStreaming() {
+  const params = new URLSearchParams(location.search);
+  const link = params.get("link");
 
-// START STREAMING
-function startStreaming(){
-  const params=
-  new URLSearchParams(
-    location.search
-  );
-
-  const link=
-  params.get("link");
-
-  if(!link){
-    showToast(
-      "No stream link found"
-    );
+  if (!link) {
+    showToast("No stream link found");
     return;
   }
 
-  let type=
-  "video/mp4";
+  let type = "video/mp4";
 
   // STREAM TYPE
-  if(link.includes(".m3u8")){
-    type=
-    "application/x-mpegURL";
+  if (link.includes(".m3u8")) {
+    type = "application/x-mpegURL";
   }
-  else if(link.includes(".mpd")){
-    type=
-    "application/dash+xml";
+  else if (link.includes(".mpd")) {
+    type = "application/dash+xml";
   }
-  else if(link.includes(".mkv")){
-    type=
-    "video/x-matroska";
+  else if (link.includes(".mkv")) {
+    type = "video/x-matroska";
   }
 
   // LOAD PLAYER
   player.src({
-    src:link,
-    type:type
+    src: link,
+    type: type
   });
 }
 
-// PLAY / PAUSE
-function togglePlay(){
-  if(player.paused()){
+// ---------------- PLAY / PAUSE ----------------
+function togglePlay() {
+  if (player.paused()) {
     player.play();
-    showToast(
-      "Playing"
-    );
+    showToast("Playing");
   }
-  else{
+  else {
     player.pause();
-    showToast(
-      "Paused"
-    );
+    showToast("Paused");
   }
 }
 
-// INCREASE VOLUME
-function increaseVolume(){
+// ---------------- VOLUME CONTROLS ----------------
+function increaseVolume() {
   let currentVol = player.volume();
   player.volume(Math.min(currentVol + 0.1, 1.0));
   
-  showToast(
-    "Volume: " + Math.round(player.volume() * 100) + "%"
-  );
+  showToast("Volume: " + Math.round(player.volume() * 100) + "%");
 }
 
-// DECREASE VOLUME
-function decreaseVolume(){
+function decreaseVolume() {
   let currentVol = player.volume();
   player.volume(Math.max(currentVol - 0.1, 0.0));
   
-  showToast(
-    "Volume: " + Math.round(player.volume() * 100) + "%"
-  );
+  showToast("Volume: " + Math.round(player.volume() * 100) + "%");
 }
 
-// SKIP FORWARD
-function skipForward(){
-  player.currentTime(
-    player.currentTime() + 10
-  );
-
+// ---------------- SKIP CONTROLS ----------------
+function skipForward() {
+  player.currentTime(player.currentTime() + 10);
   pulsePlayer();
-
-  showToast(
-    "+10 Seconds"
-  );
+  showToast("+10 Seconds");
 }
 
-// SKIP BACKWARD
-function skipBackward(){
-  player.currentTime(
-    player.currentTime() - 10
-  );
-
+function skipBackward() {
+  player.currentTime(player.currentTime() - 10);
   pulsePlayer();
-
-  showToast(
-    "-10 Seconds"
-  );
+  showToast("-10 Seconds");
 }
 
-// FULLSCREEN
-function toggleFullscreen(){
-  const wrapper=
-  document.querySelector(
-    ".player-card"
-  );
+// ---------------- FULLSCREEN CONTROL & MOBILE FALLBACK ----------------
+function toggleFullscreen() {
+  if (!playerCardContainer) return;
 
-  if(wrapper.requestFullscreen){
-    wrapper.requestFullscreen();
+  // Check if standard browser supports native element fullscreen tracking
+  if (!player.isFullscreen()) {
+    if (playerCardContainer.requestFullscreen) {
+      playerCardContainer.requestFullscreen();
+    } else if (playerCardContainer.webkitRequestFullscreen) { /* Safari/iOS Mobile */
+      playerCardContainer.webkitRequestFullscreen();
+    } else {
+      // WebView Fallback Framework implementation for restrictive layers (Telegram App)
+      playerCardContainer.classList.toggle("web-fullscreen");
+    }
+  } else {
+    player.exitFullscreen();
   }
 }
 
-// PLAYBACK SPEED
-document
-.getElementById(
-  "speedControl"
-)
-.addEventListener(
-  "change",
-  (e)=>{
-    player.playbackRate(
-      Number(
-        e.target.value
-      )
-    );
-
-    showToast(
-      "Speed: " +
-      e.target.value + "x"
-    );
+// Intercept clicks directly inside the custom control bar to enforce alternative mobile styling
+player.on('fullscreenchange', () => {
+  if (!player.isFullscreen()) {
+    // Scrub alternative view overrides if exit flags are encountered
+    playerCardContainer.classList.remove("web-fullscreen");
   }
-);
+});
 
-// COPY STREAM LINK
-function copyStreamLink(){
-  navigator.clipboard.writeText(
-    location.href
-  );
-
-  showToast(
-    "Stream link copied"
-  );
+// ---------------- DYNAMIC BADGE FADE LOGIC ----------------
+function showAndQueueFadeBadge() {
+  if (!liveBadge) return;
+  
+  clearTimeout(badgeTimeout);
+  liveBadge.classList.remove("hidden"); // Instantly unhide asset
+  
+  // Sets countdown execution logic to fade away cleanly after 3 seconds
+  badgeTimeout = setTimeout(() => {
+    if (!player.paused()) {
+      liveBadge.classList.add("hidden");
+    }
+  }, 3000);
 }
 
-// OPEN EXTERNAL PLAYER
-function openExternalPlayer(){
-  const params=
-  new URLSearchParams(
-    location.search
-  );
-
-  const link=
-  params.get("link");
-
-  window.open(
-    link
-  );
+// ---------------- PLAYBACK SPEED ----------------
+const speedControl = document.getElementById("speedControl");
+if (speedControl) {
+  speedControl.addEventListener("change", (e) => {
+    player.playbackRate(Number(e.target.value));
+    showToast("Speed: " + e.target.value + "x");
+  });
 }
 
-// PLAYER READY
-player.on(
-  'loadedmetadata',
-  ()=>{
-    loadingScreen.style.display=
-    "none";
-
-    showToast(
-      "Premium Stream Ready"
-    );
-  }
-);
-
-// BUFFER START
-player.on(
-  "waiting",
-  ()=>{
-    bufferLoader.classList.add(
-      "show"
-    );
-  }
-);
-
-// BUFFER END
-player.on(
-  "playing",
-  ()=>{
-    bufferLoader.classList.remove(
-      "show"
-    );
-  }
-);
-
-// DYNAMIC PLAY/PAUSE BUTTON TEXT
-player.on(
-  "play", 
-  ()=>{
-    if(playBtn) {
-      playBtn.innerHTML = "⏸ Pause";
-    }
-  }
-);
-
-player.on(
-  "pause", 
-  ()=>{
-    if(playBtn) {
-      playBtn.innerHTML = "⏯ Play";
-    }
-  }
-);
-
-// PLAYER ENDED
-player.on(
-  "ended",
-  ()=>{
-    showToast(
-      "Playback Finished"
-    );
-  }
-);
-
-// KEYBOARD SHORTCUTS
-document.addEventListener(
-  "keydown",
-  (e)=>{
-
-    // SPACE
-    if(e.code === "Space"){
-      e.preventDefault();
-      togglePlay();
-    }
-
-    // RIGHT
-    if(
-      e.code === "ArrowRight"
-    ){
-      skipForward();
-    }
-
-    // LEFT
-    if(
-      e.code === "ArrowLeft"
-    ){
-      skipBackward();
-    }
-
-    // UP (Volume Up)
-    if(
-      e.code === "ArrowUp"
-    ){
-      e.preventDefault();
-      increaseVolume();
-    }
-
-    // DOWN (Volume Down)
-    if(
-      e.code === "ArrowDown"
-    ){
-      e.preventDefault();
-      decreaseVolume();
-    }
-
-    // FULLSCREEN
-    if(
-      e.key.toLowerCase() === "f"
-    ){
-      toggleFullscreen();
-    }
-
-  }
-);
-
-// PLAYER PULSE EFFECT
-function pulsePlayer(){
-  const card=
-  document.querySelector(
-    ".player-card"
-  );
-
-  card.style.transform=
-  "scale(1.01)";
-
-  setTimeout(()=>{
-    card.style.transform=
-    "scale(1)";
-  },150);
+// ---------------- UTILITY ACCELERATORS ----------------
+function copyStreamLink() {
+  navigator.clipboard.writeText(location.href);
+  showToast("Stream link copied");
 }
 
-// PREMIUM TOAST
-function showToast(text){
-  const toast=
-  document.createElement(
-    "div"
-  );
+function openExternalPlayer() {
+  const params = new URLSearchParams(location.search);
+  const link = params.get("link");
+  if (link) window.open(link);
+}
 
-  toast.innerText=
-  text;
+// ---------------- PLAYER EVENT CONTROLLERS ----------------
+player.on('loadedmetadata', () => {
+  if (loadingScreen) loadingScreen.style.display = "none";
+  showToast("Premium Stream Ready");
+});
 
-  toast.style.position=
-  "fixed";
+player.on("waiting", () => {
+  if (bufferLoader) bufferLoader.classList.add("show");
+});
 
-  toast.style.bottom=
-  "30px";
+player.on("playing", () => {
+  if (bufferLoader) bufferLoader.classList.remove("show");
+});
 
-  toast.style.left=
-  "50%";
+// Player Hook Actions mapped directly to tracking overlay components
+player.on("play", () => {
+  if (playBtn) playBtn.innerHTML = "⏸ Pause";
+  showAndQueueFadeBadge();
+});
 
-  toast.style.transform=
-  "translateX(-50%)";
+player.on("pause", () => {
+  if (playBtn) playBtn.innerHTML = "⏯ Play";
+  if (liveBadge) liveBadge.classList.remove("hidden"); // Always unhide badge when paused
+});
 
-  toast.style.padding=
-  "14px 22px";
+player.on("seeking", showAndQueueFadeBadge);
 
-  toast.style.borderRadius=
-  "14px";
+player.on("ended", () => {
+  showToast("Playback Finished");
+  if (liveBadge) liveBadge.classList.remove("hidden");
+});
 
-  toast.style.background=
-  "rgba(0,0,0,0.72)";
+// ---------------- KEYBOARD SHORTCUTS ----------------
+document.addEventListener("keydown", (e) => {
+  // If user is focused inside input elements, don't execute player shortcuts
+  if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'SELECT') return;
 
-  toast.style.backdropFilter=
-  "blur(10px)";
+  if (e.code === "Space") {
+    e.preventDefault();
+    togglePlay();
+  }
+  if (e.code === "ArrowRight") {
+    skipForward();
+  }
+  if (e.code === "ArrowLeft") {
+    skipBackward();
+  }
+  if (e.code === "ArrowUp") {
+    e.preventDefault();
+    increaseVolume();
+  }
+  if (e.code === "ArrowDown") {
+    e.preventDefault();
+    decreaseVolume();
+  }
+  if (e.key.toLowerCase() === "f") {
+    e.preventDefault();
+    toggleFullscreen();
+  }
+});
 
-  toast.style.color=
-  "white";
+// ---------------- VISUAL TRANSFORM ACCELERATOR ----------------
+function pulsePlayer() {
+  if (!playerCardContainer) return;
+  playerCardContainer.style.transform = "scale(1.005)";
+  setTimeout(() => {
+    playerCardContainer.style.transform = "scale(1)";
+  }, 150);
+}
 
-  toast.style.zIndex=
-  "9999";
+// ---------------- PREMIUM TOAST INJECTOR ----------------
+function showToast(text) {
+  const toast = document.createElement("div");
+  toast.innerText = text;
 
-  toast.style.fontSize=
-  "14px";
+  toast.style.position = "fixed";
+  toast.style.bottom = "30px";
+  toast.style.left = "50%";
+  toast.style.transform = "translateX(-50%)";
+  toast.style.padding = "14px 22px";
+  toast.style.borderRadius = "14px";
+  toast.style.background = "rgba(0,0,0,0.72)";
+  toast.style.backdropFilter = "blur(10px)";
+  toast.style.webkitBackdropFilter = "blur(10px)";
+  toast.style.color = "white";
+  toast.style.zIndex = "99999";
+  toast.style.fontSize = "14px";
+  toast.style.boxShadow = "0 0 25px rgba(0,0,0,0.5)";
+  toast.style.pointerEvents = "none";
+  toast.style.transition = "opacity 0.4s ease";
 
-  toast.style.boxShadow=
-  "0 0 25px rgba(0,0,0,0.5)";
+  document.body.appendChild(toast);
 
-  toast.style.animation=
-  "fadeToast 0.25s ease";
+  setTimeout(() => {
+    toast.style.opacity = "0";
+  }, 1200);
 
-  document.body.appendChild(
-    toast
-  );
-
-  setTimeout(()=>{
-    toast.style.opacity=
-    "0";
-
-    toast.style.transition=
-    "0.4s";
-  },1200);
-
-  setTimeout(()=>{
+  setTimeout(() => {
     toast.remove();
-  },1600);
+  }, 1600);
 }
 
-// AUTO START
-window.addEventListener(
-  "DOMContentLoaded",
-  startStreaming
-);
+// ---------------- AUTO RUN ----------------
+window.addEventListener("DOMContentLoaded", startStreaming);

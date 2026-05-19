@@ -84,16 +84,20 @@ function skipBackward() {
   showToast("-10 Seconds");
 }
 
-// ---------------- HARD FORCED WEB-FULLSCREEN OVERRIDE ----------------
+// ---------------- HARD FORCED WEB-FULLSCREEN OVERRIDE & BUTTON TOGGLE ----------------
 function toggleFullscreen() {
   if (!playerCardContainer) return;
 
-  // Telegram mobile ignores native hardware requests, so we toggle our CSS override immediately
   const isWebFS = playerCardContainer.classList.contains("web-fullscreen");
+  // Grabs the custom UI button cleanly by its execution function attribute mapping
+  const fsBtn = document.querySelector("button[onclick='toggleFullscreen()']");
   
   if (!isWebFS) {
     playerCardContainer.classList.add("web-fullscreen");
     showToast("Web Fullscreen Enabled");
+    
+    // Dynamically updates text and symbol to notify user exit path options
+    if (fsBtn) fsBtn.innerHTML = "🔳 Exit Fullscreen";
     
     // Also try standard requests as a background backup measure
     if (playerCardContainer.requestFullscreen) {
@@ -103,6 +107,11 @@ function toggleFullscreen() {
     }
   } else {
     playerCardContainer.classList.remove("web-fullscreen");
+    showToast("Web Fullscreen Disabled");
+    
+    // Reverts back to normal tracking status appearance 
+    if (fsBtn) fsBtn.innerHTML = "🔲 Fullscreen";
+    
     if (document.exitFullscreen) {
       document.exitFullscreen().catch(() => {});
     } else if (document.webkitExitFullscreen) {
@@ -113,7 +122,6 @@ function toggleFullscreen() {
 
 // FORCE PICTURE-IN-PICTURE (PiP) THROUGH VIDEO.JS INSTANCE
 async function togglePiP() {
-  // Get the native element directly from Video.js technical container mapping
   const techVideo = player.tech({ IWillNotUseThisInApp: true }) ? player.tech().el_ : null;
   
   if (!techVideo) {
@@ -127,14 +135,12 @@ async function togglePiP() {
     } else if (document.pictureInPictureEnabled) {
       await techVideo.requestPictureInPicture();
     } else if (techVideo.webkitSetPresentationMode) {
-      // iOS / In-App WebView presenter mode alternative fallback routing
       techVideo.webkitSetPresentationMode(techVideo.webkitPresentationMode === "picture-in-picture" ? "inline" : "picture-in-picture");
     } else {
       showToast("PiP restricted by this mobile app environment");
     }
   } catch (error) {
     console.error("PiP Failure:", error);
-    // If native system window fails inside Telegram sandbox, treat PiP as a layout fallback maximize step
     playerCardContainer.classList.toggle("web-fullscreen");
   }
 }
@@ -145,20 +151,20 @@ function hideBadgeAfterDelay() {
   clearTimeout(badgeTimeout);
   
   badgeTimeout = setTimeout(() => {
-    // Check Video.js tracking instance status safely
     if (!player.paused()) {
       liveBadge.classList.add("hidden");
     }
   }, 3000);
 }
 
+// Brings visibility metric back up immediately
 function showBadge() {
   if (!liveBadge) return;
   clearTimeout(badgeTimeout);
   liveBadge.classList.remove("hidden");
 }
 
-// Tying stability events straight to Player abstraction instance handlers
+// Synchronizing state transitions directly with core player interface listeners
 player.on("play", () => {
   if (playBtn) playBtn.innerHTML = "⏸ Pause";
   showBadge();
@@ -175,9 +181,14 @@ player.on("seeking", () => {
   hideBadgeAfterDelay();
 });
 
+// Syncs state button markers safely if platform-native UI escape vectors run
 player.on("fullscreenchange", () => {
+  const fsBtn = document.querySelector("button[onclick='toggleFullscreen()']");
   if (!player.isFullscreen()) {
     playerCardContainer.classList.remove("web-fullscreen");
+    if (fsBtn) fsBtn.innerHTML = "🔲 Fullscreen";
+  } else {
+    if (fsBtn) fsBtn.innerHTML = "🔳 Exit Fullscreen";
   }
 });
 

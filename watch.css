@@ -207,7 +207,7 @@ body {
     0 0 40px rgba(141, 124, 255, 0.15);
 }
 
-/* TELEGRAM IN-APP FULLSCREEN FALLBACK SYSTEM OVERRIDES */
+/* 🔥 TELEGRAM IN-APP FULLSCREEN FALLBACK SYSTEM OVERRIDES (FIXED FLEXBOX GRID AGENT) */
 .player-card.web-fullscreen {
   position: fixed !important;
   top: 0 !important;
@@ -222,22 +222,24 @@ body {
   padding: 0 !important;
   margin: 0 !important;
   
-  /* 🔥 Converts the full-screen container into a flex column layout */
+  /* Forces unified container layout constraints */
   display: flex !important;
   flex-direction: column !important;
   justify-content: space-between !important;
 }
 
-/* 🔥 FIXES THE VIDEO CLIPPING/CUT-OFF BUG */
+/* 🔥 RESIZES VIDEO BOX DYNAMICALLY TO ACCOMMODATE BOTTOM ROW CONTROLS */
 .player-card.web-fullscreen .video-js {
-  flex: 1 !important; /* Tells the video to take up all remaining top space */
-  height: 100% !important; /* Forces the video bounds to respect the container dimensions */
-  max-height: calc(100dvh - 140px) !important; /* Strictly leaves exact room for the grid buttons below */
+  flex: 1 !important; 
+  height: 100% !important; 
+  width: 100% !important;
+  max-height: calc(100dvh - 140px) !important; /* Forces layout to spare explicit pixel depth for buttons underneath */
+  border-radius: 0 !important;
 }
 
 .player-card.web-fullscreen .premium-controls {
   border-radius: 0 !important;
-  margin-top: auto !important; /* Pins the control dashboard perfectly to the bottom of the screen */
+  margin-top: auto !important; /* Locks controls directly down into the view base edge */
 }
 
 .video-js {
@@ -525,6 +527,11 @@ body {
     font-size: 13px;
     border-radius: 10px;
   }
+
+  /* Fullscreen adjustments inside WebView sandboxes on medium mobile viewports */
+  .player-card.web-fullscreen .video-js {
+    max-height: calc(100dvh - 130px) !important;
+  }
 }
 
 @media(max-width:768px) {
@@ -568,15 +575,15 @@ body {
   .video-js {
     height: 240px;
   }
-
-  /* Fullscreen Viewport calculation overrides inside WebView sandboxes */
-  .player-card.web-fullscreen .video-js {
-    height: calc(100dvh - 140px) !important;
-  }
 }
 
 @media(max-width:480px) {
   .premium-controls {
     grid-template-columns: repeat(2, 1fr); /* Snaps column structures cleanly to dual pairings on tight touch screens */
+  }
+
+  /* Fullscreen adjustments inside WebView sandboxes on tiny mobile viewports */
+  .player-card.web-fullscreen .video-js {
+    max-height: calc(100dvh - 190px) !important; /* Spares more breathing space for heavily stacked buttons */
   }
 }

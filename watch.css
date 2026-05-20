@@ -607,13 +607,38 @@ body {
     flex: 0 0 auto !important; /* Prevents the video from shrinking */
   }
 
-  /* Controls sit naturally below the video, revealed when scrolled */
+  /* 🎛️ NEW: SINGLE HORIZONTAL ROW FOR CONTROLS */
   .player-card.web-fullscreen .premium-controls {
     width: 100vw !important; 
     height: auto !important;
-    margin-top: 15px !important;
-    padding: 10px 20px 40px 20px !important; /* Extra padding at bottom for easy scrolling */
+    margin-top: 10px !important;
+    padding: 15px 20px 40px 20px !important; /* Extra padding at bottom */
     flex: 0 0 auto !important;
     box-sizing: border-box !important;
+    
+    /* Force into a single horizontally scrollable line */
+    display: flex !important;
+    flex-direction: row !important; 
+    flex-wrap: nowrap !important; /* Stops buttons from stacking */
+    overflow-x: auto !important; /* Allows you to swipe the buttons left/right */
+    gap: 12px !important; /* Adds space between each button */
+    
+    /* Hide the scrollbar for a cleaner, app-like look */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .player-card.web-fullscreen .premium-controls::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Adjust button sizing so they look perfect in a row */
+  .player-card.web-fullscreen .premium-btn,
+  .player-card.web-fullscreen .speed-select {
+    flex: 0 0 auto !important; /* Stops the browser from squishing them */
+    width: auto !important;
+    white-space: nowrap !important; /* Keeps button text on one line */
+    margin: 0 !important;
+    padding: 12px 20px !important;
   }
 }

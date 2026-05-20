@@ -587,3 +587,33 @@ body {
     max-height: calc(100dvh - 190px) !important; /* Spares more breathing space for heavily stacked buttons */
   }
 }
+
+/* =========================================
+   📱 MOBILE LANDSCAPE FULLSCREEN FIX 
+   ========================================= */
+@media (orientation: landscape) and (max-height: 600px) {
+  /* Keep elements stacked vertically and allow scrolling */
+  .player-card.web-fullscreen {
+    flex-direction: column !important; 
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Video takes up 100% of the screen width and height */
+  .player-card.web-fullscreen .video-js {
+    width: 100vw !important; 
+    height: 100dvh !important; 
+    min-height: 100dvh !important;
+    flex: 0 0 auto !important; /* Prevents the video from shrinking */
+  }
+
+  /* Controls sit naturally below the video, revealed when scrolled */
+  .player-card.web-fullscreen .premium-controls {
+    width: 100vw !important; 
+    height: auto !important;
+    margin-top: 15px !important;
+    padding: 10px 20px 40px 20px !important; /* Extra padding at bottom for easy scrolling */
+    flex: 0 0 auto !important;
+    box-sizing: border-box !important;
+  }
+}

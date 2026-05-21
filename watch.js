@@ -207,8 +207,8 @@ function copyStreamLink() {
   showToast("Stream link copied");
 }
 
-// ---------------- MX PLAYER DEEP LINK ROUTING ----------------
-function openInMXPlayer() {
+// ---------------- DOWNLOAD VIDEO FEATURE ----------------
+function downloadVideo() {
   const params = new URLSearchParams(location.search);
   const link = params.get("link");
   
@@ -217,35 +217,26 @@ function openInMXPlayer() {
     return;
   }
 
-  // Detect if the user is on an Android device
-  const isAndroid = /Android/i.test(navigator.userAgent);
-
-  if (isAndroid) {
-    const cleanLink = link.replace(/^https?:\/\//, '');
-    const scheme = link.startsWith('https') ? 'https' : 'http';
-    
-    // Upgraded Intent with Action View and Play Store Fallback
-    const mxIntent = `intent://${cleanLink}#Intent;scheme=${scheme};package=com.mxtech.videoplayer.ad;action=android.intent.action.VIEW;S.browser_fallback_url=https://play.google.com/store/apps/details?id=com.mxtech.videoplayer.ad;end;`;
-    
-    showToast("Launching MX Player...");
-    
-    // Telegram WebView Bypass: Create a hidden physical link and force-click it
-    const hiddenLink = document.createElement("a");
-    hiddenLink.href = mxIntent;
-    hiddenLink.style.display = "none";
-    document.body.appendChild(hiddenLink);
-    
-    hiddenLink.click(); // Simulates a real user tap to bypass security blocks
-    
-    // Clean up the fake link after clicking
-    setTimeout(() => {
-      document.body.removeChild(hiddenLink);
-    }, 500);
-
-  } else {
-    showToast("MX Player app is for Android. Opening in browser...");
-    window.open(link, "_blank");
+  // Prevent attempting to download segmented streaming playlists (.m3u8 / .mpd) directly
+  if (link.includes(".m3u8") || link.includes(".mpd")) {
+    showToast("Cannot direct download live stream playlists.");
+    return;
   }
+
+  showToast("Starting download...");
+
+  // Creates a hidden anchor tag to force a download prompt in the browser
+  const hiddenLink = document.createElement("a");
+  hiddenLink.href = link;
+  hiddenLink.target = "_blank"; // Opens in a new tab if cross-origin rules prevent a direct download
+  hiddenLink.download = "NTM_Stream_Video"; // Suggests a filename to the browser
+  
+  document.body.appendChild(hiddenLink);
+  hiddenLink.click();
+  
+  setTimeout(() => {
+    document.body.removeChild(hiddenLink);
+  }, 500);
 }
 
 // ---------------- HOOK LOAD LIFECYCLES ----------------

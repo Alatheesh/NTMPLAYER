@@ -12,12 +12,11 @@
     body::after { display: block !important; content: ""; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 60% 30%, rgba(0, 123, 255, 0.1) 0%, transparent 50%), radial-gradient(circle at 40% 70%, rgba(0, 191, 255, 0.1) 0%, transparent 50%); filter: blur(70px); z-index: -3; animation: auroraDrift 20s infinite alternate-reverse ease-in-out !important; pointer-events: none; }
     @keyframes auroraDrift { 0% { transform: scale(1) translate(0px, 0px); opacity: 0.5; } 50% { transform: scale(1.1) translate(2vw, 3vh); opacity: 1; } 100% { transform: scale(0.9) translate(-2vw, 4vh); opacity: 0.6; } }
     
-    /* 📄 CONTENT STYLING */
+    /* 📄 CONTENT STYLING - MATCHED TO YOUR LEGAL STYLE */
     .legal-container { max-width: 600px; margin: 40px auto; padding: 30px; background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; text-align: left; color: rgba(255, 255, 255, 0.85); }
     .legal-header { text-align: center; margin-bottom: 25px; }
     h1 { color: #00bfff; }
     h2 { color: #ff5500; font-size: 20px; margin-top: 20px; }
-    p { margin-bottom: 15px; line-height: 1.6; }
     
     /* 🔘 BUTTON STYLING */
     .btn-container { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
@@ -27,8 +26,6 @@
 </head>
 <body>
   <div class="legal-container">
-    <button class="back-btn" onclick="window.history.back()">← Back</button>
-    
     <div class="legal-header">
       <h1>📩 DMCA Policy</h1>
     </div>
@@ -37,10 +34,10 @@
     <p>NTM Online respects the intellectual property rights of others and complies fully with the DMCA. <strong>We do not host, upload, or store any media files on our own servers.</strong></p>
     
     <h2>2. Takedown Requests</h2>
-    <p>If you believe any content violates your copyright, please provide the exact URL(s) and proof of ownership. We will promptly remove the indexing link from our database.</p>
+    <p>If you are a copyright owner and believe that a link on our indexing site directs to your copyrighted work, we are committed to resolving the issue. Because we do not host the files, we cannot delete them from the internet, but we will promptly remove the indexing link from our database.</p>
     
     <h2>3. How to Contact Us</h2>
-    <p>To submit a DMCA takedown request, please use the options below. Including the Website URL in your request helps us process it immediately.</p>
+    <p>To submit a DMCA takedown request, please provide the exact URL(s) on NTM Online that link to the infringing material, along with proof of copyright ownership.</p>
     
     <div class="btn-container">
       <a href="mailto:ntm.admin.notice@proton.me" class="btn-dmca" style="background: linear-gradient(135deg, #00bfff, #007bff);">

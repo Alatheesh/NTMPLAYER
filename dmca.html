@@ -1,87 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-<meta charset="UTF-8">
-
-<meta
-name="viewport"
-content="width=device-width, initial-scale=1.0"
->
-
-<title>
-DMCA Policy • NTM Stream
-</title>
-
-<link
-rel="stylesheet"
-href="legal.css"
-/>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DMCA Policy | NTM Stream</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ✨ CINEMATIC AURORA ANIMATION */
+    body::before, body::after { animation: none !important; background-image: none !important; }
+    body::before { display: block !important; content: ""; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 30% 40%, rgba(0, 191, 255, 0.15) 0%, transparent 40%), radial-gradient(circle at 70% 60%, rgba(141, 124, 255, 0.15) 0%, transparent 40%); filter: blur(60px); z-index: -2; animation: auroraDrift 15s infinite alternate ease-in-out !important; pointer-events: none; }
+    body::after { display: block !important; content: ""; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 60% 30%, rgba(0, 123, 255, 0.1) 0%, transparent 50%), radial-gradient(circle at 40% 70%, rgba(0, 191, 255, 0.1) 0%, transparent 50%); filter: blur(70px); z-index: -3; animation: auroraDrift 20s infinite alternate-reverse ease-in-out !important; pointer-events: none; }
+    @keyframes auroraDrift { 0% { transform: scale(1) translate(0px, 0px); opacity: 0.5; } 50% { transform: scale(1.1) translate(2vw, 3vh); opacity: 1; } 100% { transform: scale(0.9) translate(-2vw, 4vh); opacity: 0.6; } }
+    
+    /* 📄 CONTENT STYLING */
+    .legal-container { max-width: 600px; margin: 40px auto; padding: 30px; background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; text-align: left; color: rgba(255, 255, 255, 0.85); }
+    .legal-header { text-align: center; margin-bottom: 25px; }
+    h1 { color: #00bfff; }
+    h2 { color: #ff5500; font-size: 20px; margin-top: 20px; }
+    
+    /* 🔘 BUTTON STYLING */
+    .btn-container { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
+    .btn-dmca { padding: 12px 20px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; text-decoration: none; font-size: 14px; }
+    .back-btn { background: rgba(255, 255, 255, 0.1); color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; margin-top: 20px; }
+  </style>
 </head>
-
 <body>
+  <div class="legal-container">
+    <div class="legal-header">
+      <h1>📩 DMCA Policy</h1>
+    </div>
+    
+    <p>NTM Stream respects the rights of copyright owners and complies fully with the DMCA. We do not host any media files.</p>
+    
+    <h2>Takedown Requests</h2>
+    <p>If you believe any content violates your copyright, please provide the exact URL(s) and proof of ownership. We will promptly remove the indexing link from our database.</p>
+    
+    <div class="btn-container">
+      <a href="mailto:ntm.admin.notice@proton.me" class="btn-dmca" style="background: linear-gradient(135deg, #00bfff, #007bff);">
+        📧 Send Email
+      </a>
+      <a href="https://t.me/YourBotUsername" target="_blank" class="btn-dmca" style="background: linear-gradient(135deg, #2aabee, #229ed9);">
+        🤖 Use Takedown Bot
+      </a>
+    </div>
+    
+    <p style="margin-top: 20px; font-size: 13px; color: #888;">
+      Note: Please include the Website URL in your subject line for faster processing.
+    </p>
 
-<div class="legal-bg"></div>
-
-<div class="legal-container">
-
-<h1>
-📩 DMCA Policy
-</h1>
-
-<p>
-NTM Stream respects the
-rights of copyright owners.
-</p>
-
-<p>
-If you believe that any
-content linked through this
-website violates your
-copyrights, you may submit
-a DMCA removal request.
-</p>
-
-<p>
-Please include sufficient
-information regarding the
-copyrighted work and the
-content in question.
-</p>
-
-<p>
-After review, appropriate
-actions may be taken if
-necessary.
-</p>
-
-<p>
-For copyright concerns,
-content removal requests,
-or legal inquiries,
-please contact us through
-our official contact page.
-</p>
-
-<a
-href="contact.html"
-class="legal-btn"
->
-📬 Contact Us
-</a>
-
-<br><br>
-
-<button
-onclick="history.back()"
-class="legal-btn"
->
-← Back To Stream
-</button>
-
-</div>
-
+    <div style="text-align: center;">
+      <button onclick="history.back()" class="back-btn">← Back To Stream</button>
+    </div>
+  </div>
 </body>
 </html>

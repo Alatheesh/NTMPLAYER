@@ -1,60 +1,307 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DMCA Policy | NTM Online</title>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    /* ✨ CINEMATIC AURORA ANIMATION */
-    body::before, body::after { animation: none !important; background-image: none !important; }
-    body::before { display: block !important; content: ""; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 30% 40%, rgba(0, 191, 255, 0.15) 0%, transparent 40%), radial-gradient(circle at 70% 60%, rgba(141, 124, 255, 0.15) 0%, transparent 40%); filter: blur(60px); z-index: -2; animation: auroraDrift 15s infinite alternate ease-in-out !important; pointer-events: none; }
-    body::after { display: block !important; content: ""; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 60% 30%, rgba(0, 123, 255, 0.1) 0%, transparent 50%), radial-gradient(circle at 40% 70%, rgba(0, 191, 255, 0.1) 0%, transparent 50%); filter: blur(70px); z-index: -3; animation: auroraDrift 20s infinite alternate-reverse ease-in-out !important; pointer-events: none; }
-    @keyframes auroraDrift { 0% { transform: scale(1) translate(0px, 0px); opacity: 0.5; } 50% { transform: scale(1.1) translate(2vw, 3vh); opacity: 1; } 100% { transform: scale(0.9) translate(-2vw, 4vh); opacity: 0.6; } }
-    
-    /* 📄 CONTENT STYLING - MATCHED TO YOUR LEGAL STYLE */
-    .legal-container { max-width: 600px; margin: 40px auto; padding: 30px; background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; text-align: left; color: rgba(255, 255, 255, 0.85); }
-    .legal-header { text-align: center; margin-bottom: 25px; }
-    h1 { color: #00bfff; }
-    h2 { color: #ff5500; font-size: 20px; margin-top: 20px; }
-    
-    /* 🔘 BUTTON STYLING */
-    .btn-container { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
-    .btn-dmca { padding: 12px 20px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; text-decoration: none; font-size: 14px; }
-    .back-btn { background: rgba(255, 255, 255, 0.1); color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; margin-top: 20px; }
-  </style>
-</head>
-<body>
-  <div class="legal-container">
-    <div class="legal-header">
-      <h1>📩 DMCA Policy</h1>
-    </div>
-    
-    <h2>1. No Hosting Policy</h2>
-    <p>NTM Online respects the intellectual property rights of others and complies fully with the DMCA. <strong>We do not host, upload, or store any media files on our own servers.</strong></p>
-    
-    <h2>2. Takedown Requests</h2>
-    <p>If you are a copyright owner and believe that a link on our indexing site directs to your copyrighted work, we are committed to resolving the issue. Because we do not host the files, we cannot delete them from the internet, but we will promptly remove the indexing link from our database.</p>
-    
-    <h2>3. How to Contact Us</h2>
-    <p>To submit a DMCA takedown request, please provide the exact URL(s) on NTM Online that link to the infringing material, along with proof of copyright ownership.</p>
-    
-    <div class="btn-container">
-      <a href="mailto:ntm.admin.notice@proton.me" class="btn-dmca" style="background: linear-gradient(135deg, #00bfff, #007bff);">
-        📧 Send Email
-      </a>
-      <a href="https://t.me/YourBotUsername" target="_blank" class="btn-dmca" style="background: linear-gradient(135deg, #2aabee, #229ed9);">
-        🤖 Use Takedown Bot
-      </a>
-    </div>
-    
-    <p style="margin-top: 20px; font-size: 13px; color: #888;">
-      Note: Please include the Website URL in your subject line for faster processing.
-    </p>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-    <div style="text-align: center;">
-      <button onclick="history.back()" class="back-btn">← Back To Stream</button>
-    </div>
+<title>DMCA Policy | NTM Online</title>
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:#020611;
+  overflow:hidden;
+  position:relative;
+  padding:20px;
+}
+
+/* ✨ CINEMATIC BACKGROUND */
+
+body::before{
+  content:"";
+  position:fixed;
+  width:700px;
+  height:700px;
+  background:radial-gradient(circle, rgba(0,140,255,0.18), transparent 70%);
+  top:-200px;
+  left:-150px;
+  filter:blur(90px);
+  z-index:-2;
+}
+
+body::after{
+  content:"";
+  position:fixed;
+  width:700px;
+  height:700px;
+  background:radial-gradient(circle, rgba(255,0,140,0.12), transparent 70%);
+  bottom:-250px;
+  right:-150px;
+  filter:blur(100px);
+  z-index:-2;
+}
+
+/* 📄 MAIN CARD */
+
+.dmca-card{
+  width:100%;
+  max-width:930px;
+  padding:55px 60px;
+  border-radius:30px;
+
+  background:
+  linear-gradient(
+    135deg,
+    rgba(12,20,38,0.95),
+    rgba(7,7,12,0.96)
+  );
+
+  border:1px solid rgba(255,255,255,0.07);
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.02),
+    0 25px 80px rgba(0,0,0,0.55);
+
+  position:relative;
+  overflow:hidden;
+}
+
+/* subtle glow inside card */
+
+.dmca-card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+  radial-gradient(circle at top left,
+  rgba(0,140,255,0.08),
+  transparent 35%);
+  pointer-events:none;
+}
+
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:18px;
+  margin-bottom:45px;
+}
+
+.header h1{
+  font-size:58px;
+  font-weight:700;
+  background:linear-gradient(90deg,#3ea6ff,#b16cff);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.icon{
+  font-size:52px;
+}
+
+/* 📌 SECTION */
+
+.section{
+  margin-bottom:34px;
+  text-align:center;
+}
+
+.section h2{
+  color:#ff7b2c;
+  font-size:25px;
+  margin-bottom:14px;
+}
+
+.section p{
+  color:rgba(255,255,255,0.76);
+  font-size:18px;
+  line-height:1.9;
+  max-width:760px;
+  margin:auto;
+}
+
+.section strong{
+  color:white;
+}
+
+/* 🔘 BUTTONS */
+
+.button-group{
+  display:flex;
+  justify-content:center;
+  gap:18px;
+  margin-top:45px;
+  flex-wrap:wrap;
+}
+
+.btn{
+  padding:15px 28px;
+  border-radius:14px;
+  text-decoration:none;
+  color:white;
+  font-weight:600;
+  transition:0.3s ease;
+  border:1px solid rgba(255,255,255,0.08);
+}
+
+.btn:hover{
+  transform:translateY(-3px);
+}
+
+.email-btn{
+  background:linear-gradient(135deg,#009dff,#006eff);
+  box-shadow:0 10px 25px rgba(0,110,255,0.25);
+}
+
+.bot-btn{
+  background:linear-gradient(135deg,#2aabee,#1c8fe0);
+  box-shadow:0 10px 25px rgba(42,171,238,0.22);
+}
+
+.back-btn{
+  margin-top:32px;
+  display:inline-block;
+  background:rgba(20,40,70,0.8);
+  padding:14px 28px;
+  border-radius:14px;
+  color:white;
+  text-decoration:none;
+  border:1px solid rgba(255,255,255,0.06);
+  transition:0.3s ease;
+}
+
+.back-btn:hover{
+  background:rgba(30,55,95,0.95);
+  transform:translateY(-2px);
+}
+
+/* 📝 FOOT NOTE */
+
+.note{
+  margin-top:28px;
+  text-align:center;
+  color:rgba(255,255,255,0.45);
+  font-size:14px;
+}
+
+/* 📱 MOBILE */
+
+@media(max-width:768px){
+
+  .dmca-card{
+    padding:38px 26px;
+    border-radius:24px;
+  }
+
+  .header h1{
+    font-size:40px;
+  }
+
+  .icon{
+    font-size:38px;
+  }
+
+  .section h2{
+    font-size:22px;
+  }
+
+  .section p{
+    font-size:16px;
+    line-height:1.8;
+  }
+
+  .button-group{
+    flex-direction:column;
+  }
+
+  .btn{
+    width:100%;
+    text-align:center;
+  }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="dmca-card">
+
+  <div class="header">
+    <div class="icon">📩</div>
+    <h1>DMCA Policy</h1>
   </div>
+
+  <div class="section">
+    <h2>1. No Hosting Policy</h2>
+
+    <p>
+      NTM Online respects the intellectual property rights of others
+      and complies fully with the DMCA.
+      <strong>
+      We do not host, upload, or store any media files on our own servers.
+      </strong>
+    </p>
+  </div>
+
+  <div class="section">
+    <h2>2. Takedown Requests</h2>
+
+    <p>
+      If you are a copyright owner and believe that a link on our indexing
+      site directs to your copyrighted work, we are committed to resolving
+      the issue. Since we do not host the files, we cannot remove them from
+      the internet directly, but we will promptly remove the indexing link
+      from our database.
+    </p>
+  </div>
+
+  <div class="section">
+    <h2>3. How to Contact Us</h2>
+
+    <p>
+      Please provide the exact URL(s) on NTM Online that link to the
+      infringing material along with proof of copyright ownership.
+    </p>
+  </div>
+
+  <div class="button-group">
+
+    <a href="mailto:ntm.admin.notice@proton.me"
+       class="btn email-btn">
+       📧 Send Email
+    </a>
+
+    <a href="https://t.me/YourBotUsername"
+       target="_blank"
+       class="btn bot-btn">
+       🤖 Use Takedown Bot
+    </a>
+
+  </div>
+
+  <div class="note">
+    Note: Please include the Website URL in your subject line for faster processing.
+  </div>
+
+  <div style="text-align:center;">
+    <a href="javascript:history.back()" class="back-btn">
+      ← Back To Stream
+    </a>
+  </div>
+
+</div>
+
 </body>
 </html>

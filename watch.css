@@ -512,6 +512,49 @@ body {
   backdrop-filter: blur(10px);
 }
 
+/* 🚀 NETFLIX-STYLE EPISODE ROW CSS */
+.episode-container {
+  display: none; /* Hidden by default if it's just a movie */
+  margin-top: 20px;
+  padding: 10px 5px;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: thin;
+  scrollbar-color: #00bfff #0a1128;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.episode-container::-webkit-scrollbar { height: 8px; }
+.episode-container::-webkit-scrollbar-track { background: #0a1128; border-radius: 4px; }
+.episode-container::-webkit-scrollbar-thumb { background: #00bfff; border-radius: 4px; }
+
+.ep-btn {
+  background: #111;
+  color: #888;
+  border: 2px solid #333;
+  padding: 10px 20px;
+  margin-right: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.ep-btn:hover {
+  background: #222;
+  color: #fff;
+  border-color: #555;
+}
+
+.ep-btn.active {
+  background: rgba(0, 191, 255, 0.1);
+  border-color: #00bfff;
+  color: #00bfff;
+  box-shadow: 0 0 15px rgba(0, 191, 255, 0.3);
+  transform: scale(1.05);
+}
+
 /* 📱 HIGHLY RESPONSIVE PHONE LAYOUT MATRIX BREAKPOINTS */
 @media(max-width:900px) {
   .premium-controls {

@@ -317,13 +317,22 @@ if (speedControl) {
 function copyStreamLink() {
   if (!bingeData) return;
   
-  const currentItem = bingeData.playlist[bingeData.currentIndex];
-  const link = typeof currentItem === "string" ? currentItem : currentItem.url;
+  // 🚀 FIXED: We package the ENTIRE season (playlist + current episode) into the share link!
+  let scrambledPayload = "";
   
-  const shareableUrl = window.location.origin + window.location.pathname + "?link=" + encodeURIComponent(link);
+  try {
+    // This safe encoding prevents errors if the movie name has Telugu/Unicode characters
+    scrambledPayload = btoa(unescape(encodeURIComponent(JSON.stringify(bingeData))));
+  } catch(e) {
+    // Fallback just in case
+    scrambledPayload = btoa(JSON.stringify(bingeData));
+  }
+  
+  // Generate the Master Data URL instead of the single link URL
+  const shareableUrl = window.location.origin + window.location.pathname + "?data=" + encodeURIComponent(scrambledPayload);
   
   navigator.clipboard.writeText(shareableUrl);
-  showToast("Shareable Stream Link Copied!");
+  showToast("Full Season Link Copied!");
 }
 
 // ---------------- HOOK LOAD LIFECYCLES ----------------

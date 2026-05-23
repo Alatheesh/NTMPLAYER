@@ -25,7 +25,7 @@ let badgeTimeout;
 function initPlayer() {
   const urlParams = new URLSearchParams(window.location.search);
   const dataParam = urlParams.get('data');
-  const linkParam = urlParams.get('link'); // 🚀 NEW: Supports direct links!
+  const linkParam = urlParams.get('link'); 
 
   if (dataParam) {
     try {
@@ -35,7 +35,9 @@ function initPlayer() {
       // Unscramble the Base64 package
       let decodedStr = "";
       try { decodedStr = atob(dataParam); } catch(e) { decodedStr = dataParam; }
-      bingeData = JSON.parse(decodedStr);
+      
+      // Fix for special characters (like Telugu names)
+      bingeData = JSON.parse(decodeURIComponent(escape(decodedStr)));
 
       // Erase '?data=' from the address bar instantly to keep it clean!
       window.history.replaceState({}, document.title, window.location.pathname);
@@ -44,7 +46,7 @@ function initPlayer() {
     }
   } 
   else if (linkParam) {
-    // 🚀 NEW: If you paste ?link= directly into the browser, it plays it!
+    // If you paste ?link= directly into the browser, it plays it!
     bingeData = {
       currentIndex: 0,
       playlist: [ linkParam ]
@@ -57,7 +59,7 @@ function initPlayer() {
       try {
         let decodedStr = "";
         try { decodedStr = atob(rawData); } catch(e) { decodedStr = rawData; }
-        bingeData = JSON.parse(decodedStr);
+        bingeData = JSON.parse(decodeURIComponent(escape(decodedStr)));
       } catch(e) {}
     }
   }
@@ -81,9 +83,19 @@ function loadVideoByIndex(index) {
   const currentItem = bingeData.playlist[index];
   
   // Extract URL (it might be a string or an object)
-  const link = typeof currentItem === "string" ? currentItem : currentItem.url;
+  let link = typeof currentItem === "string" ? currentItem : currentItem.url;
 
-  // Determine file type automatically
+  // 🚀 THE FIX: UNSCRAMBLE THE LINK FOR NEW FILES!
+  try {
+    // If the link does not start with http, it is scrambled Base64! Unscramble it.
+    if (!link.startsWith("http")) {
+      link = atob(link);
+    }
+  } catch(e) {
+    console.error("Link unscramble failed:", e);
+  }
+
+  // Determine file type automatically based on the UNSCRAMBLED link
   let type = "video/mp4";
   if (link.includes(".m3u8")) {
     type = "application/x-mpegURL";
@@ -94,6 +106,7 @@ function loadVideoByIndex(index) {
   }
 
   if (loadingScreen) loadingScreen.style.display = "flex";
+  if (bufferLoader) bufferLoader.classList.add("show");
   
   // Feed URL to Video.js
   player.src({
@@ -103,6 +116,7 @@ function loadVideoByIndex(index) {
 
   player.play().then(() => {
     if (loadingScreen) loadingScreen.style.display = "none";
+    if (bufferLoader) bufferLoader.classList.remove("show");
   }).catch(e => {
     console.log("Autoplay prevented, waiting for user interaction.");
     if (loadingScreen) loadingScreen.style.display = "none";
@@ -193,17 +207,14 @@ function toggleFullscreen() {
   if (!playerCardContainer) return;
 
   const isWebFS = playerCardContainer.classList.contains("web-fullscreen");
-  // Grabs the custom UI button cleanly by its execution function attribute mapping
   const fsBtn = document.querySelector("button[onclick='toggleFullscreen()']");
   
   if (!isWebFS) {
     playerCardContainer.classList.add("web-fullscreen");
     showToast("Web Fullscreen Enabled");
     
-    // Dynamically updates text and symbol to notify user exit path options
     if (fsBtn) fsBtn.innerHTML = "🔳 Exit Fullscreen";
     
-    // Also try standard requests as a background backup measure
     if (playerCardContainer.requestFullscreen) {
       playerCardContainer.requestFullscreen().catch(() => {});
     } else if (playerCardContainer.webkitRequestFullscreen) {
@@ -213,7 +224,6 @@ function toggleFullscreen() {
     playerCardContainer.classList.remove("web-fullscreen");
     showToast("Web Fullscreen Disabled");
     
-    // Reverts back to normal tracking status appearance 
     if (fsBtn) fsBtn.innerHTML = "🔲 Fullscreen";
     
     if (document.exitFullscreen) {
@@ -261,7 +271,6 @@ function hideBadgeAfterDelay() {
   }, 3000);
 }
 
-// Brings visibility metric back up immediately
 function showBadge() {
   if (!liveBadge) return;
   clearTimeout(badgeTimeout);
@@ -285,7 +294,6 @@ player.on("seeking", () => {
   hideBadgeAfterDelay();
 });
 
-// Syncs state button markers safely if platform-native UI escape vectors run
 player.on("fullscreenchange", () => {
   const fsBtn = document.querySelector("button[onclick='toggleFullscreen()']");
   if (!player.isFullscreen()) {
@@ -307,7 +315,6 @@ if (speedControl) {
 
 // ---------------- UTILITY CONTROLS ----------------
 function copyStreamLink() {
-  // 🚀 FIXED: Generates a perfect shareable link even if the URL is hidden!
   if (!bingeData) return;
   
   const currentItem = bingeData.playlist[bingeData.currentIndex];
@@ -337,6 +344,13 @@ player.on("playing", () => {
 player.on("ended", () => {
   showToast("Playback Finished");
   showBadge();
+});
+
+// 🚀 NEW: ERROR HANDLING
+player.on("error", () => {
+  if (loadingScreen) loadingScreen.style.display = "none";
+  if (bufferLoader) bufferLoader.classList.remove("show");
+  showToast("Error: Video link broken or unsupported.");
 });
 
 // ---------------- KEYBOARD SHORTCUTS ----------------

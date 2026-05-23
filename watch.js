@@ -1,3 +1,6 @@
+// 🚀 GLOBAL BINGE-WATCH DATA & VIDEO.JS INIT
+let bingeData = null;
+
 const player = videojs(
   'videoPlayer',
   {
@@ -18,32 +21,125 @@ const liveBadge = document.getElementById("liveBadge");
 
 let badgeTimeout;
 
-// ---------------- START STREAMING ----------------
-function startStreaming() {
-  const params = new URLSearchParams(location.search);
-  const link = params.get("link");
+// ---------------- INITIALIZE PLAYER & GHOST URL TRICK ----------------
+function initPlayer() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const dataParam = urlParams.get('data');
 
-  if (!link) {
-    showToast("No stream link found");
+  if (dataParam) {
+    try {
+      // Unscramble the Base64 package
+      let decodedStr = "";
+      try { decodedStr = atob(dataParam); } catch(e) { decodedStr = dataParam; }
+      bingeData = JSON.parse(decodedStr);
+
+      // 🪄 THE GHOST URL TRICK: Erase '?data=' from the address bar instantly!
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } catch (e) {
+      console.error("Failed to parse stream data.", e);
+    }
+  } else {
+    // Failsafe: Try to grab from sessionStorage if they refresh the page
+    let rawData = sessionStorage.getItem("secureStreamData");
+    if (rawData) {
+      try {
+        let decodedStr = "";
+        try { decodedStr = atob(rawData); } catch(e) { decodedStr = rawData; }
+        bingeData = JSON.parse(decodedStr);
+      } catch(e) {}
+    }
+  }
+
+  // If no data was found, send them back
+  if (!bingeData || !bingeData.playlist || bingeData.playlist.length === 0) {
+    showToast("Stream data not found. Redirecting to Hub...");
+    setTimeout(() => {
+      window.location.replace("index.html");
+    }, 2500);
     return;
   }
 
-  let type = "video/mp4";
+  // Start the first/clicked episode
+  loadVideoByIndex(bingeData.currentIndex);
+}
 
+// ---------------- LOAD SPECIFIC EPISODE ----------------
+function loadVideoByIndex(index) {
+  if (index < 0 || index >= bingeData.playlist.length) return;
+  
+  // Update current index
+  bingeData.currentIndex = index;
+  const currentItem = bingeData.playlist[index];
+  
+  // Extract URL (it might be a string or an object)
+  const link = typeof currentItem === "string" ? currentItem : currentItem.url;
+
+  // Determine file type automatically
+  let type = "video/mp4";
   if (link.includes(".m3u8")) {
     type = "application/x-mpegURL";
-  }
-  else if (link.includes(".mpd")) {
+  } else if (link.includes(".mpd")) {
     type = "application/dash+xml";
-  }
-  else if (link.includes(".mkv")) {
+  } else if (link.includes(".mkv")) {
     type = "video/x-matroska";
   }
 
+  if (loadingScreen) loadingScreen.style.display = "flex";
+  
+  // Feed URL to Video.js
   player.src({
     src: link,
     type: type
   });
+
+  player.play().then(() => {
+    if (loadingScreen) loadingScreen.style.display = "none";
+  }).catch(e => {
+    console.log("Autoplay prevented, waiting for user interaction.");
+    if (loadingScreen) loadingScreen.style.display = "none";
+  });
+
+  // Re-draw the Netflix Server Row to highlight the active episode
+  buildEpisodeRow();
+}
+
+// ---------------- BUILD EPISODE UI ROW ----------------
+function buildEpisodeRow() {
+  const container = document.getElementById("episodeContainer");
+  if (!container) return;
+
+  // Hide the row completely if it's just a single movie
+  if (bingeData.playlist.length <= 1) {
+    container.style.display = "none";
+    return;
+  }
+
+  container.style.display = "block";
+  let html = "";
+
+  bingeData.playlist.forEach((item, i) => {
+    let label = `Episode ${i + 1}`;
+    
+    if (typeof item === "object" && item.episode) {
+      label = item.episode; // e.g., "Ep 1"
+    } else if (typeof item === "object" && item.size) {
+      label = `Part ${i + 1} (${item.size}${item.unit})`;
+    }
+
+    const isActive = (i === bingeData.currentIndex) ? "active" : "";
+    
+    html += `<button class="ep-btn ${isActive}" onclick="loadVideoByIndex(${i})">${label}</button>`;
+  });
+
+  container.innerHTML = html;
+
+  // Auto-scroll the row so the active episode button is perfectly in the center!
+  setTimeout(() => {
+    const activeBtn = container.querySelector('.active');
+    if (activeBtn) {
+      activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+  }, 100);
 }
 
 // ---------------- PLAY / PAUSE ----------------
@@ -51,8 +147,7 @@ function togglePlay() {
   if (player.paused()) {
     player.play();
     showToast("Playing");
-  }
-  else {
+  } else {
     player.pause();
     showToast("Paused");
   }
@@ -207,38 +302,6 @@ function copyStreamLink() {
   showToast("Stream link copied");
 }
 
-// ---------------- DOWNLOAD VIDEO FEATURE ----------------
-function downloadVideo() {
-  const params = new URLSearchParams(location.search);
-  const link = params.get("link");
-  
-  if (!link) {
-    showToast("No stream link found");
-    return;
-  }
-
-  // Prevent attempting to download segmented streaming playlists (.m3u8 / .mpd) directly
-  if (link.includes(".m3u8") || link.includes(".mpd")) {
-    showToast("Cannot direct download live stream playlists.");
-    return;
-  }
-
-  showToast("Starting download...");
-
-  // Creates a hidden anchor tag to force a download prompt in the browser
-  const hiddenLink = document.createElement("a");
-  hiddenLink.href = link;
-  hiddenLink.target = "_blank"; // Opens in a new tab if cross-origin rules prevent a direct download
-  hiddenLink.download = "NTM_Stream_Video"; // Suggests a filename to the browser
-  
-  document.body.appendChild(hiddenLink);
-  hiddenLink.click();
-  
-  setTimeout(() => {
-    document.body.removeChild(hiddenLink);
-  }, 500);
-}
-
 // ---------------- HOOK LOAD LIFECYCLES ----------------
 player.on('loadedmetadata', () => {
   if (loadingScreen) loadingScreen.style.display = "none";
@@ -321,4 +384,4 @@ function showToast(text) {
   setTimeout(() => { toast.remove(); }, 1500);
 }
 
-window.addEventListener("DOMContentLoaded", startStreaming);
+window.addEventListener("DOMContentLoaded", initPlayer);

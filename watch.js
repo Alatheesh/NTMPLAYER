@@ -25,21 +25,33 @@ let badgeTimeout;
 function initPlayer() {
   const urlParams = new URLSearchParams(window.location.search);
   const dataParam = urlParams.get('data');
+  const linkParam = urlParams.get('link'); // 🚀 NEW: Supports direct links!
 
   if (dataParam) {
     try {
+      // Save to sessionStorage so it survives page refreshes!
+      sessionStorage.setItem("secureStreamData", dataParam);
+      
       // Unscramble the Base64 package
       let decodedStr = "";
       try { decodedStr = atob(dataParam); } catch(e) { decodedStr = dataParam; }
       bingeData = JSON.parse(decodedStr);
 
-      // 🪄 THE GHOST URL TRICK: Erase '?data=' from the address bar instantly!
+      // Erase '?data=' from the address bar instantly to keep it clean!
       window.history.replaceState({}, document.title, window.location.pathname);
     } catch (e) {
       console.error("Failed to parse stream data.", e);
     }
-  } else {
-    // Failsafe: Try to grab from sessionStorage if they refresh the page
+  } 
+  else if (linkParam) {
+    // 🚀 NEW: If you paste ?link= directly into the browser, it plays it!
+    bingeData = {
+      currentIndex: 0,
+      playlist: [ linkParam ]
+    };
+  } 
+  else {
+    // Failsafe: Grab from sessionStorage if they refresh the clean page
     let rawData = sessionStorage.getItem("secureStreamData");
     if (rawData) {
       try {
@@ -50,12 +62,9 @@ function initPlayer() {
     }
   }
 
-  // If no data was found, send them back
+  // If absolutely no data was found, warn them
   if (!bingeData || !bingeData.playlist || bingeData.playlist.length === 0) {
-    showToast("Stream data not found. Redirecting to Hub...");
-    setTimeout(() => {
-      window.location.replace("index.html");
-    }, 2500);
+    showToast("Stream link missing! Go back to the Hub and select a movie.");
     return;
   }
 
@@ -298,8 +307,16 @@ if (speedControl) {
 
 // ---------------- UTILITY CONTROLS ----------------
 function copyStreamLink() {
-  navigator.clipboard.writeText(location.href);
-  showToast("Stream link copied");
+  // 🚀 FIXED: Generates a perfect shareable link even if the URL is hidden!
+  if (!bingeData) return;
+  
+  const currentItem = bingeData.playlist[bingeData.currentIndex];
+  const link = typeof currentItem === "string" ? currentItem : currentItem.url;
+  
+  const shareableUrl = window.location.origin + window.location.pathname + "?link=" + encodeURIComponent(link);
+  
+  navigator.clipboard.writeText(shareableUrl);
+  showToast("Shareable Stream Link Copied!");
 }
 
 // ---------------- HOOK LOAD LIFECYCLES ----------------

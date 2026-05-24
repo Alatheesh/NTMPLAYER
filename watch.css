@@ -255,6 +255,11 @@ body {
   backdrop-filter: blur(12px);
 }
 
+/* 🔥 HIDE NATIVE VIDEO.JS SPINNER TO PREVENT DOUBLE-BUFFERING GHOSTING */
+.video-js .vjs-loading-spinner {
+  display: none !important;
+}
+
 .vjs-big-play-button {
   border: none !important;
   border-radius: 50% !important;

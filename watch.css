@@ -9,234 +9,691 @@ body {
   color: white;
   font-family: Arial, sans-serif;
   overflow-x: hidden;
+  min-height: 100vh;
+  position: relative;
+  padding-top: 90px;
 }
 
+/* BACKGROUND ACCENTS */
 .bg-overlay {
   position: fixed;
   inset: 0;
-  background: radial-gradient(circle at top, #08111f 0%, #020202 60%);
-  z-index: -1;
+  background:
+    radial-gradient(circle at top left, rgba(0,180,255,0.16), transparent 35%),
+    radial-gradient(circle at bottom right, rgba(0,120,255,0.12), transparent 35%),
+    linear-gradient(135deg, #020202, #070b14, #020202);
+  z-index: -4;
 }
 
-.top-bar {
+.particles {
   position: fixed;
-  top: 0;
-  left: 0;
+  inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: particlesMove 18s linear infinite;
+  opacity: 0.18;
+  z-index: -3;
+}
+
+.ambient-light {
+  position: fixed;
+  width: 700px;
+  height: 700px;
+  border-radius: 50%;
+  background: radial-gradient(rgba(0,180,255,0.16), transparent 70%);
+  top: -200px;
+  left: -200px;
+  filter: blur(50px);
+  animation: ambientMove 12s ease infinite;
+  z-index: -2;
+}
+
+/* TOP BAR NAV */
+.top-bar {
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 22px;
-  background: rgba(0, 0, 0, 0.82);
-  backdrop-filter: blur(12px);
-  z-index: 999;
+  padding: 18px 30px;
+  position: absolute; 
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  isolation: isolate;
+  backdrop-filter: blur(18px);
+  background: rgba(0,0,0,0.82);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  box-shadow: 0 0 30px rgba(0,0,0,0.45);
 }
 
+/* PREMIUM GLOW LOGO */
 .logo {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
+  position: relative;
+  padding: 12px 22px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, rgba(0,180,255,0.10), rgba(0,90,255,0.04));
+  border: 1px solid rgba(120,220,255,0.12);
+  backdrop-filter: blur(16px);
+  overflow: hidden;
+  box-shadow: 0 0 25px rgba(0,170,255,0.18), 0 0 50px rgba(0,110,255,0.08), inset 0 0 25px rgba(255,255,255,0.03);
+  transition: 0.4s;
+}
+
+.logo::before {
+  content: "";
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(rgba(0,220,255,0.30), transparent 70%);
+  top: -90px;
+  left: -60px;
+  filter: blur(30px);
+  animation: logoGlowMove 7s ease infinite;
 }
 
 .logo-img {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 0 14px rgba(0,220,255,0.85)) drop-shadow(0 0 35px rgba(0,120,255,0.45));
+  animation: logoFloat 5s ease infinite;
 }
 
 .logo span {
-  font-size: 20px;
-  font-weight: 700;
-  color: #7cecff;
+  position: relative;
+  z-index: 2;
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  background: linear-gradient(90deg, #dffcff, #7cecff, #33bfff, #8d7cff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
+/* TOP ACTIONS BUTTONS */
 .top-actions {
   display: flex;
-  gap: 10px;
+  gap: 12px;
 }
 
 .top-btn {
   border: none;
-  background: #08152b;
-  color: white;
+  outline: none;
   padding: 12px 18px;
-  border-radius: 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  color: white;
   cursor: pointer;
+  transition: 0.3s;
+  font-size: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
+.top-btn:hover {
+  background: #009dff;
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 0 20px rgba(0,170,255,0.4);
+}
+
+/* HERO SLAT */
 .hero {
-  padding-top: 95px;
+  width: 100%;
+  text-align: center;
+  padding: 90px 20px 25px;
+  position: relative;
+  z-index: 1;
 }
 
+.hero h1 {
+  font-size: 58px;
+  font-weight: bold;
+  background: linear-gradient(90deg, #7cecff, #00bfff, #7d7dff, #7cecff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% auto;
+  animation: textShimmer 6s linear infinite;
+}
+
+.hero p {
+  margin-top: 18px;
+  color: #aaa;
+  font-size: 18px;
+}
+
+/* CINEMATIC BLADE SHADOW ACCENT */
+.cinematic-blade {
+  height: 2px;
+  margin: 30px auto; 
+  border-radius: 50%;
+  background: linear-gradient(90deg, transparent, #00bfff, #8d7cff, transparent);
+  box-shadow: 0 0 20px rgba(0, 191, 255, 0.8), 0 0 40px rgba(141, 124, 255, 0.4);
+  animation: bladePulse 4s ease-in-out infinite alternate;
+}
+
+/* PLAYER HOUSING AREA */
 .player-section {
   width: 100%;
-  padding: 18px;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  position: relative;
+  z-index: 1;
 }
 
 .player-card {
   width: 100%;
-  max-width: 1400px;
-  margin: auto;
-  border-radius: 22px;
-  overflow: hidden;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.06);
-  box-shadow: 0 0 40px rgba(0,0,0,0.35);
+  max-width: 1280px;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 0 60px rgba(0,150,255,0.12);
+  animation: fadeUp 1s ease, ambientGlow 8s ease infinite;
+  transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.player-card:hover {
+  transform: translateY(-4px) scale(1.005);
+  box-shadow: 
+    0 20px 80px rgba(0, 191, 255, 0.25), 
+    0 0 40px rgba(141, 124, 255, 0.15);
+}
+
+/* 🔥 TELEGRAM IN-APP FULLSCREEN FALLBACK SYSTEM OVERRIDES (FIXED FLEXBOX GRID AGENT) */
+.player-card.web-fullscreen {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  max-width: none !important;
+  border-radius: 0 !important;
+  z-index: 999999 !important;
+  background: #000000 !important;
+  transform: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  
+  /* Forces unified container layout constraints */
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+}
+
+/* 🔥 RESIZES VIDEO BOX DYNAMICALLY TO ACCOMMODATE BOTTOM ROW CONTROLS */
+.player-card.web-fullscreen .video-js {
+  flex: 1 !important; 
+  height: 100% !important; 
+  width: 100% !important;
+  max-height: calc(100dvh - 140px) !important; /* Forces layout to spare explicit pixel depth for buttons underneath */
+  border-radius: 0 !important;
+}
+
+.player-card.web-fullscreen .premium-controls {
+  border-radius: 0 !important;
+  margin-top: auto !important; /* Locks controls directly down into the view base edge */
 }
 
 .video-js {
   width: 100%;
-  height: 78vh;
-  min-height: 320px;
+  height: 720px;
   background: black;
+  border-radius: 28px 28px 0 0;
 }
 
-.video-js .vjs-big-play-button {
-  border-radius: 50% !important;
-  width: 78px !important;
-  height: 78px !important;
-  line-height: 78px !important;
-  background: rgba(0, 174, 255, 0.92) !important;
+/* VIDEO JS DOCK OVERLAY COMPLIANCE */
+.vjs-control-bar {
+  background: rgba(0,0,0,0.72) !important;
+  backdrop-filter: blur(12px);
+}
+
+/* 🔥 HIDE NATIVE VIDEO.JS SPINNER TO PREVENT DOUBLE-BUFFERING GHOSTING */
+.video-js .vjs-loading-spinner {
+  display: none !important;
+}
+
+.vjs-big-play-button {
   border: none !important;
-  top: 50% !important;
-  left: 50% !important;
-  transform: translate(-50%, -50%) !important;
-  box-shadow: 0 0 30px rgba(0,174,255,0.45);
+  border-radius: 50% !important;
+  width: 100px !important;
+  height: 100px !important;
+  line-height: 100px !important;
+  background: rgba(0,160,255,0.85) !important;
 }
 
-.video-js.vjs-has-started .vjs-big-play-button {
-  display: none !important;
-}
-
-.video-js.vjs-paused .vjs-loading-spinner {
-  display: none !important;
-}
-
+/* 🔥 PREMIUM CONTROLS DOCK - GRID SYMMETRY UPGRADE */
 .premium-controls {
+  width: 100%;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(6, 1fr); /* Creates 6 balanced visual grid tracks */
   gap: 12px;
-  padding: 18px;
-  background: #050b16;
+  padding: 24px;
+  background: rgba(4, 6, 12, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 0 0 28px 28px;
 }
 
+/* INTERACTIVE CORE CONTROLS LAYOUT */
 .premium-btn,
 .speed-select {
-  height: 46px;
+  width: 100%;
+  height: 48px;
   border: none;
-  border-radius: 14px;
-  background: #0d1729;
-  color: white;
-  font-weight: 600;
-}
-
-.live-badge {
-  position: absolute;
-  top: 18px;
-  left: 18px;
-  background: rgba(0,174,255,0.18);
-  border: 1px solid rgba(0,174,255,0.3);
-  padding: 10px 14px;
-  border-radius: 999px;
-  font-size: 12px;
-  backdrop-filter: blur(8px);
-}
-
-.episode-container {
-  display: flex;
-  gap: 10px;
-  overflow-x: auto;
-  padding: 18px;
-}
-
-.ep-btn {
-  border: none;
-  background: #0c1524;
-  color: white;
-  padding: 12px 18px;
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
   cursor: pointer;
-  white-space: nowrap;
+  
+  /* Frosted Glass Treatment Layer */
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-.ep-btn.active {
-  background: #00aaff;
+/* Speed Custom Dropdown Configuration Layout bounds */
+.speed-select {
+  appearance: none;
+  -webkit-appearance: none;
+  text-align: center;
+  padding-left: 10px;
 }
 
+.speed-select option {
+  background: #070b14;
+  color: white;
+}
+
+/* TRANSITION ACCELERATIONS FOR GENERAL SHORTCUT HOVERS */
+.premium-btn:hover,
+.speed-select:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+/* 🔥 SPECIAL EMBEDDED CORES (Main Priority Accent Buttons) */
+#playPauseBtn {
+  background: linear-gradient(135deg, #007bff, #00bfff) !important;
+  border: none !important;
+  box-shadow: 0 4px 15px rgba(0, 191, 255, 0.3);
+}
+
+#playPauseBtn:hover {
+  box-shadow: 0 6px 20px rgba(0, 191, 255, 0.5);
+  transform: translateY(-2px) scale(1.02);
+}
+
+/* LOADING MASK SHIELD INITIALIZATION MAPS */
+.loading-screen,
+.buffer-loader {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(10px);
+  z-index: 90;
+  border-radius: 28px 28px 0 0;
+}
+
+.buffer-loader {
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.3s;
+}
+
+.buffer-loader.show {
+  opacity: 1;
+}
+
+.loader-ring,
+.buffer-spinner {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 5px solid rgba(255, 255, 255, 0.08);
+  border-top: 5px solid #00bfff;
+  animation: spin 1s linear infinite;
+}
+
+/* SHIELD DISCLAIMER CARD BOX TEXT */
 .premium-disclaimer {
-  padding: 50px 18px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 70px 20px;
 }
 
 .disclaimer-card {
-  max-width: 1000px;
-  margin: auto;
-  background: rgba(255,255,255,0.04);
-  border-radius: 24px;
-  padding: 35px;
-  line-height: 1.9;
+  width: 100%;
+  max-width: 1100px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 30px;
+  backdrop-filter: blur(14px);
+  padding: 50px;
+  text-align: center;
+  line-height: 2;
+  color: #cfcfcf;
 }
 
+/* FOOTER BRAND REGISTRY FRAMEWORK */
 .premium-footer {
+  width: 100%;
   text-align: center;
-  padding: 40px 20px;
-  color: #888;
+  padding: 40px 15px 55px;
+  color: #777;
+  line-height: 2;
+}
+
+/* 🔥 BRAND STATUS RADIAL BADGE */
+.live-badge {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  padding: 10px 16px;
+  border-radius: 40px;
+  background: rgba(0, 170, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: white;
+  font-size: 12px;
+  z-index: 30;
+  pointer-events: none;
+  
+  opacity: 1;
+  transition: opacity 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+  animation: pulseGlow 2s infinite;
+}
+
+.live-badge.hidden {
+  opacity: 0 !important;
 }
 
 .footer-links {
+  margin-top: 18px;
   display: flex;
   justify-content: center;
-  gap: 16px;
+  gap: 22px;
   flex-wrap: wrap;
-  margin-top: 16px;
 }
 
 .footer-links a {
-  color: #7cecff;
+  color: #9fdfff;
   text-decoration: none;
+  transition: 0.3s;
 }
 
-@media (max-width: 768px) {
+.footer-links a:hover {
+  color: white;
+  text-shadow: 0 0 10px rgba(0,190,255,0.4);
+}
+
+.logo:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 0 35px rgba(0,190,255,0.28), 0 0 80px rgba(0,120,255,0.14);
+}
+
+/* SYSTEM TIME LOOPS SEQUENCING KEYFRAMES */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes particlesMove {
+  from { transform: translateY(0); }
+  to { transform: translateY(-40px); }
+}
+
+@keyframes ambientMove {
+  0% { transform: translate(0,0); }
+  50% { transform: translate(120px,80px); }
+  100% { transform: translate(0,0); }
+}
+
+@keyframes ambientGlow {
+  0% { box-shadow: 0 0 40px rgba(0,170,255,0.14); }
+  50% { box-shadow: 0 0 70px rgba(0,120,255,0.18); }
+  100% { box-shadow: 0 0 40px rgba(0,200,255,0.14); }
+}
+
+@keyframes logoGlowMove {
+  0% { transform: translateX(0px) translateY(0px); }
+  50% { transform: translateX(40px) translateY(18px); }
+  100% { transform: translateX(0px) translateY(0px); }
+}
+
+@keyframes logoFloat {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-4px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes bladePulse {
+  0% { width: 0%; opacity: 0; }
+  30% { width: 60%; opacity: 1; }
+  100% { width: 75%; opacity: 0.6; box-shadow: 0 0 10px rgba(0, 191, 255, 0.4); }
+}
+
+@keyframes textShimmer {
+  to { background-position: 200% center; }
+}
+
+@keyframes pulseGlow {
+  0% { box-shadow: 0 0 10px rgba(0,170,255,0.2); }
+  50% { box-shadow: 0 0 25px rgba(0,170,255,0.45); }
+  100% { box-shadow: 0 0 10px rgba(0,170,255,0.2); }
+}
+
+.hero-badge {
+  display: inline-block;
+  padding: 10px 18px;
+  border-radius: 40px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 25px;
+  color: #bbb;
+  font-size: 13px;
+  backdrop-filter: blur(10px);
+}
+
+/* 🚀 NETFLIX-STYLE EPISODE ROW CSS */
+.episode-container {
+  display: none; /* Hidden by default if it's just a movie */
+  margin-top: 20px;
+  padding: 10px 5px;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: thin;
+  scrollbar-color: #00bfff #0a1128;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.episode-container::-webkit-scrollbar { height: 8px; }
+.episode-container::-webkit-scrollbar-track { background: #0a1128; border-radius: 4px; }
+.episode-container::-webkit-scrollbar-thumb { background: #00bfff; border-radius: 4px; }
+
+.ep-btn {
+  background: #111;
+  color: #888;
+  border: 2px solid #333;
+  padding: 10px 20px;
+  margin-right: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.ep-btn:hover {
+  background: #222;
+  color: #fff;
+  border-color: #555;
+}
+
+.ep-btn.active {
+  background: rgba(0, 191, 255, 0.1);
+  border-color: #00bfff;
+  color: #00bfff;
+  box-shadow: 0 0 15px rgba(0, 191, 255, 0.3);
+  transform: scale(1.05);
+}
+
+/* 📱 HIGHLY RESPONSIVE PHONE LAYOUT MATRIX BREAKPOINTS */
+@media(max-width:900px) {
+  .premium-controls {
+    grid-template-columns: repeat(3, 1fr); /* Snaps dashboard grid to clean 3-column rows */
+    gap: 10px;
+    padding: 16px;
+    border-radius: 0 0 20px 20px;
+  }
+  
+  .premium-btn,
+  .speed-select {
+    height: 44px;
+    font-size: 13px;
+    border-radius: 10px;
+  }
+
+  /* Fullscreen adjustments inside WebView sandboxes on medium mobile viewports */
+  .player-card.web-fullscreen .video-js {
+    max-height: calc(100dvh - 130px) !important;
+  }
+}
+
+@media(max-width:768px) {
+  body {
+    padding-top: 140px;
+  }
+
   .top-bar {
-    padding: 12px;
-    flex-direction: row;
+    padding: 15px 10px;
+    flex-direction: column; 
+    gap: 12px;
+  }
+
+  .top-actions {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap; 
   }
 
   .logo span {
-    font-size: 16px;
+    font-size: 22px;
   }
 
-  .top-btn {
-    padding: 10px 12px;
-    font-size: 12px;
+  .logo-img {
+    width: 44px;
+    height: 44px;
   }
 
-  .player-section {
-    padding: 8px;
+  .hero {
+    padding-top: 150px; 
   }
 
-  .player-card {
-    border-radius: 16px;
+  .hero h1 {
+    font-size: 34px;
+  }
+
+  .hero p {
+    font-size: 14px;
   }
 
   .video-js {
     height: 240px;
-    min-height: auto;
   }
+}
 
+@media(max-width:480px) {
   .premium-controls {
-    grid-template-columns: repeat(2, 1fr);
-    padding: 12px;
+    grid-template-columns: repeat(2, 1fr); /* Snaps column structures cleanly to dual pairings on tight touch screens */
   }
 
-  .premium-btn,
-  .speed-select {
-    height: 42px;
-    font-size: 13px;
+  /* Fullscreen adjustments inside WebView sandboxes on tiny mobile viewports */
+  .player-card.web-fullscreen .video-js {
+    max-height: calc(100dvh - 190px) !important; /* Spares more breathing space for heavily stacked buttons */
+  }
+}
+
+/* =========================================
+   📱 MOBILE LANDSCAPE FULLSCREEN FIX 
+   ========================================= */
+@media (orientation: landscape) and (max-height: 600px) {
+  
+  /* 🚀 NEW: HIDE THE EPISODE ROW COMPLETELY IN LANDSCAPE */
+  .player-card.web-fullscreen .episode-container,
+  .episode-container {
+    display: none !important;
   }
 
-  .video-js .vjs-big-play-button {
-    width: 68px !important;
-    height: 68px !important;
-    line-height: 68px !important;
+  /* Keep elements stacked vertically and allow scrolling */
+  .player-card.web-fullscreen {
+    flex-direction: column !important; 
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Video takes up 100% of the screen width and height */
+  .player-card.web-fullscreen .video-js {
+    width: 100vw !important; 
+    height: 100dvh !important; 
+    min-height: 100dvh !important;
+    flex: 0 0 auto !important; /* Prevents the video from shrinking */
+  }
+
+  /* 🎛️ NEW: SINGLE HORIZONTAL ROW FOR CONTROLS */
+  .player-card.web-fullscreen .premium-controls {
+    width: 100vw !important; 
+    height: auto !important;
+    margin-top: 10px !important;
+    padding: 15px 20px 40px 20px !important; /* Extra padding at bottom */
+    flex: 0 0 auto !important;
+    box-sizing: border-box !important;
+    
+    /* Force into a single horizontally scrollable line */
+    display: flex !important;
+    flex-direction: row !important; 
+    flex-wrap: nowrap !important; /* Stops buttons from stacking */
+    overflow-x: auto !important; /* Allows you to swipe the buttons left/right */
+    gap: 12px !important; /* Adds space between each button */
+    
+    /* Hide the scrollbar for a cleaner, app-like look */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .player-card.web-fullscreen .premium-controls::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Adjust button sizing so they look perfect in a row */
+  .player-card.web-fullscreen .premium-btn,
+  .player-card.web-fullscreen .speed-select {
+    flex: 0 0 auto !important; /* Stops the browser from squishing them */
+    width: auto !important;
+    white-space: nowrap !important; /* Keeps button text on one line */
+    margin: 0 !important;
+    padding: 12px 20px !important;
   }
 }

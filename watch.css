@@ -635,6 +635,13 @@ body {
    📱 MOBILE LANDSCAPE FULLSCREEN FIX 
    ========================================= */
 @media (orientation: landscape) and (max-height: 600px) {
+  
+  /* 🚀 NEW: HIDE THE EPISODE ROW COMPLETELY IN LANDSCAPE */
+  .player-card.web-fullscreen .episode-container,
+  .episode-container {
+    display: none !important;
+  }
+
   /* Keep elements stacked vertically and allow scrolling */
   .player-card.web-fullscreen {
     flex-direction: column !important; 

@@ -227,21 +227,38 @@ body {
   justify-content: space-between !important;
 }
 
-/* 🔥 RESIZES VIDEO BOX DYNAMICALLY TO ACCOMMODATE BOTTOM ROW CONTROLS */
-/* The loading screens are added here so they squeeze exactly with the video! */
-.player-card.web-fullscreen .video-js,
-.player-card.web-fullscreen .loading-screen,
-.player-card.web-fullscreen .buffer-loader {
+/* 🔥 DYNAMIC WRAPPER TO KEEP OVERLAYS PERFECTLY SIZED 🔥 */
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  border-radius: 28px 28px 0 0;
+}
+
+/* 🔥 RESIZES VIDEO BOX DYNAMICALLY IN WEB-FULLSCREEN */
+.player-card.web-fullscreen .video-wrapper {
   flex: 1 !important; 
   height: 100% !important; 
   width: 100% !important;
   max-height: calc(100dvh - 140px) !important;
   border-radius: 0 !important;
+  display: flex;
+}
+
+.player-card.web-fullscreen .video-js {
+  flex: 1 !important; 
+  height: 100% !important; 
+  width: 100% !important;
+  border-radius: 0 !important;
+}
+
+.player-card.web-fullscreen .loading-screen,
+.player-card.web-fullscreen .buffer-loader {
+  border-radius: 0 !important;
 }
 
 .player-card.web-fullscreen .premium-controls {
   border-radius: 0 !important;
-  margin-top: auto !important;
+  margin-top: auto !important; 
 }
 
 .video-js {
@@ -337,14 +354,14 @@ body {
   transform: translateY(-2px) scale(1.02);
 }
 
-/* 🔥 BUFFERING MASK RE-ENGINEERED TO ONLY COVER THE VIDEO 🔥 */
+/* 🔥 BUFFERING MASK RE-ENGINEERED TO DYNAMICALLY MATCH THE WRAPPER 🔥 */
 .loading-screen,
 .buffer-loader {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 720px; /* MATCHES DESKTOP VIDEO HEIGHT - Leaves controls perfectly clear! */
+  height: 100%; /* 🔥 Automatically takes the exact height of the fluid video! */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -576,7 +593,7 @@ body {
     border-radius: 10px;
   }
 
-  .player-card.web-fullscreen .video-js {
+  .player-card.web-fullscreen .video-wrapper {
     max-height: calc(100dvh - 130px) !important;
   }
 }
@@ -622,12 +639,6 @@ body {
   .video-js {
     height: 240px;
   }
-
-  /* 🔥 LOCKS BUFFERING OVERLAY TO EXACT MOBILE VIDEO HEIGHT 🔥 */
-  .loading-screen,
-  .buffer-loader {
-    height: 240px; 
-  }
 }
 
 @media(max-width:480px) {
@@ -635,7 +646,7 @@ body {
     grid-template-columns: repeat(2, 1fr); 
   }
 
-  .player-card.web-fullscreen .video-js {
+  .player-card.web-fullscreen .video-wrapper {
     max-height: calc(100dvh - 190px) !important; 
   }
 }
@@ -657,9 +668,8 @@ body {
   }
 
   /* 🔥 LOCKS BUFFERING OVERLAY TO EXACT LANDSCAPE VIDEO HEIGHT 🔥 */
-  .player-card.web-fullscreen .video-js,
-  .player-card.web-fullscreen .loading-screen,
-  .player-card.web-fullscreen .buffer-loader {
+  .player-card.web-fullscreen .video-wrapper,
+  .player-card.web-fullscreen .video-js {
     width: 100vw !important; 
     height: 100dvh !important; 
     min-height: 100dvh !important;

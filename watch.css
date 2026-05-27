@@ -145,7 +145,8 @@ body {
 .hero {
   width: 100%;
   text-align: center;
-  padding: 90px 20px 25px;
+  /* 🔥 FIXED: Reduced top padding from 90px to 20px to remove desktop buffer */
+  padding: 20px 20px 25px; 
   position: relative;
   z-index: 1;
 }
@@ -609,7 +610,8 @@ body {
   }
 
   .hero {
-    padding-top: 150px; 
+    /* 🔥 FIXED: Reduced mobile top padding from 150px to 20px */
+    padding-top: 20px; 
   }
 
   .hero h1 {

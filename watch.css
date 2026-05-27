@@ -11,7 +11,7 @@ body {
   overflow-x: hidden;
   min-height: 100vh;
   position: relative;
-  padding-top: 90px;
+  padding-top: 85px;
 }
 
 /* BACKGROUND ACCENTS */
@@ -145,7 +145,7 @@ body {
 .hero {
   width: 100%;
   text-align: center;
-  padding: 90px 20px 25px; 
+  padding: 0px 20px 20px; 
   position: relative;
   z-index: 1;
 }
@@ -169,7 +169,7 @@ body {
 /* CINEMATIC BLADE SHADOW ACCENT */
 .cinematic-blade {
   height: 2px;
-  margin: 30px auto; 
+  margin: 15px auto; 
   border-radius: 50%;
   background: linear-gradient(90deg, transparent, #00bfff, #8d7cff, transparent);
   box-shadow: 0 0 20px rgba(0, 191, 255, 0.8), 0 0 40px rgba(141, 124, 255, 0.4);
@@ -207,7 +207,7 @@ body {
     0 0 40px rgba(141, 124, 255, 0.15);
 }
 
-/* 🔥 TELEGRAM IN-APP FULLSCREEN FALLBACK SYSTEM OVERRIDES (FIXED FLEXBOX GRID AGENT) */
+/* 🔥 TELEGRAM IN-APP FULLSCREEN FALLBACK SYSTEM OVERRIDES */
 .player-card.web-fullscreen {
   position: fixed !important;
   top: 0 !important;
@@ -222,24 +222,26 @@ body {
   padding: 0 !important;
   margin: 0 !important;
   
-  /* Forces unified container layout constraints */
   display: flex !important;
   flex-direction: column !important;
   justify-content: space-between !important;
 }
 
 /* 🔥 RESIZES VIDEO BOX DYNAMICALLY TO ACCOMMODATE BOTTOM ROW CONTROLS */
-.player-card.web-fullscreen .video-js {
+/* The loading screens are added here so they squeeze exactly with the video! */
+.player-card.web-fullscreen .video-js,
+.player-card.web-fullscreen .loading-screen,
+.player-card.web-fullscreen .buffer-loader {
   flex: 1 !important; 
   height: 100% !important; 
   width: 100% !important;
-  max-height: calc(100dvh - 140px) !important; /* Forces layout to spare explicit pixel depth for buttons underneath */
+  max-height: calc(100dvh - 140px) !important;
   border-radius: 0 !important;
 }
 
 .player-card.web-fullscreen .premium-controls {
   border-radius: 0 !important;
-  margin-top: auto !important; /* Locks controls directly down into the view base edge */
+  margin-top: auto !important;
 }
 
 .video-js {
@@ -255,7 +257,6 @@ body {
   backdrop-filter: blur(12px);
 }
 
-/* 🔥 HIDE NATIVE VIDEO.JS SPINNER TO PREVENT DOUBLE-BUFFERING GHOSTING */
 .video-js .vjs-loading-spinner {
   display: none !important;
 }
@@ -269,11 +270,11 @@ body {
   background: rgba(0,160,255,0.85) !important;
 }
 
-/* 🔥 PREMIUM CONTROLS DOCK - GRID SYMMETRY UPGRADE */
+/* 🔥 PREMIUM CONTROLS DOCK */
 .premium-controls {
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(6, 1fr); /* Creates 6 balanced visual grid tracks */
+  grid-template-columns: repeat(6, 1fr); 
   gap: 12px;
   padding: 24px;
   background: rgba(4, 6, 12, 0.85);
@@ -300,14 +301,12 @@ body {
   color: white;
   cursor: pointer;
   
-  /* Frosted Glass Treatment Layer */
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.06);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-/* Speed Custom Dropdown Configuration Layout bounds */
 .speed-select {
   appearance: none;
   -webkit-appearance: none;
@@ -320,7 +319,6 @@ body {
   color: white;
 }
 
-/* TRANSITION ACCELERATIONS FOR GENERAL SHORTCUT HOVERS */
 .premium-btn:hover,
 .speed-select:hover {
   background: rgba(255, 255, 255, 0.09);
@@ -328,7 +326,6 @@ body {
   transform: translateY(-2px);
 }
 
-/* 🔥 SPECIAL EMBEDDED CORES (Main Priority Accent Buttons) */
 #playPauseBtn {
   background: linear-gradient(135deg, #007bff, #00bfff) !important;
   border: none !important;
@@ -340,11 +337,14 @@ body {
   transform: translateY(-2px) scale(1.02);
 }
 
-/* LOADING MASK SHIELD INITIALIZATION MAPS */
+/* 🔥 BUFFERING MASK RE-ENGINEERED TO ONLY COVER THE VIDEO 🔥 */
 .loading-screen,
 .buffer-loader {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 720px; /* MATCHES DESKTOP VIDEO HEIGHT - Leaves controls perfectly clear! */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -519,7 +519,7 @@ body {
 
 /* 🚀 NETFLIX-STYLE EPISODE ROW CSS */
 .episode-container {
-  display: none; /* Hidden by default if it's just a movie */
+  display: none; 
   margin-top: 20px;
   padding: 10px 5px;
   overflow-x: auto;
@@ -563,7 +563,7 @@ body {
 /* 📱 HIGHLY RESPONSIVE PHONE LAYOUT MATRIX BREAKPOINTS */
 @media(max-width:900px) {
   .premium-controls {
-    grid-template-columns: repeat(3, 1fr); /* Snaps dashboard grid to clean 3-column rows */
+    grid-template-columns: repeat(3, 1fr); 
     gap: 10px;
     padding: 16px;
     border-radius: 0 0 20px 20px;
@@ -576,7 +576,6 @@ body {
     border-radius: 10px;
   }
 
-  /* Fullscreen adjustments inside WebView sandboxes on medium mobile viewports */
   .player-card.web-fullscreen .video-js {
     max-height: calc(100dvh - 130px) !important;
   }
@@ -584,7 +583,7 @@ body {
 
 @media(max-width:768px) {
   body {
-    padding-top: 140px; 
+    padding-top: 85px; 
   }
 
   .top-bar {
@@ -609,7 +608,7 @@ body {
   }
 
   .hero {
-    padding-top: 150px; 
+    padding-top: 0px; 
   }
 
   .hero h1 {
@@ -623,16 +622,21 @@ body {
   .video-js {
     height: 240px;
   }
+
+  /* 🔥 LOCKS BUFFERING OVERLAY TO EXACT MOBILE VIDEO HEIGHT 🔥 */
+  .loading-screen,
+  .buffer-loader {
+    height: 240px; 
+  }
 }
 
 @media(max-width:480px) {
   .premium-controls {
-    grid-template-columns: repeat(2, 1fr); /* Snaps column structures cleanly to dual pairings on tight touch screens */
+    grid-template-columns: repeat(2, 1fr); 
   }
 
-  /* Fullscreen adjustments inside WebView sandboxes on tiny mobile viewports */
   .player-card.web-fullscreen .video-js {
-    max-height: calc(100dvh - 190px) !important; /* Spares more breathing space for heavily stacked buttons */
+    max-height: calc(100dvh - 190px) !important; 
   }
 }
 
@@ -641,44 +645,41 @@ body {
    ========================================= */
 @media (orientation: landscape) and (max-height: 600px) {
   
-  /* 🚀 NEW: HIDE THE EPISODE ROW COMPLETELY IN LANDSCAPE */
   .player-card.web-fullscreen .episode-container,
   .episode-container {
     display: none !important;
   }
 
-  /* Keep elements stacked vertically and allow scrolling */
   .player-card.web-fullscreen {
     flex-direction: column !important; 
     overflow-y: auto !important;
     overflow-x: hidden !important;
   }
 
-  /* Video takes up 100% of the screen width and height */
-  .player-card.web-fullscreen .video-js {
+  /* 🔥 LOCKS BUFFERING OVERLAY TO EXACT LANDSCAPE VIDEO HEIGHT 🔥 */
+  .player-card.web-fullscreen .video-js,
+  .player-card.web-fullscreen .loading-screen,
+  .player-card.web-fullscreen .buffer-loader {
     width: 100vw !important; 
     height: 100dvh !important; 
     min-height: 100dvh !important;
-    flex: 0 0 auto !important; /* Prevents the video from shrinking */
+    flex: 0 0 auto !important; 
   }
 
-  /* 🎛️ NEW: SINGLE HORIZONTAL ROW FOR CONTROLS */
   .player-card.web-fullscreen .premium-controls {
     width: 100vw !important; 
     height: auto !important;
     margin-top: 10px !important;
-    padding: 15px 20px 40px 20px !important; /* Extra padding at bottom */
+    padding: 15px 20px 40px 20px !important; 
     flex: 0 0 auto !important;
     box-sizing: border-box !important;
     
-    /* Force into a single horizontally scrollable line */
     display: flex !important;
     flex-direction: row !important; 
-    flex-wrap: nowrap !important; /* Stops buttons from stacking */
-    overflow-x: auto !important; /* Allows you to swipe the buttons left/right */
-    gap: 12px !important; /* Adds space between each button */
+    flex-wrap: nowrap !important; 
+    overflow-x: auto !important; 
+    gap: 12px !important; 
     
-    /* Hide the scrollbar for a cleaner, app-like look */
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
@@ -687,12 +688,11 @@ body {
     display: none;
   }
 
-  /* Adjust button sizing so they look perfect in a row */
   .player-card.web-fullscreen .premium-btn,
   .player-card.web-fullscreen .speed-select {
-    flex: 0 0 auto !important; /* Stops the browser from squishing them */
+    flex: 0 0 auto !important; 
     width: auto !important;
-    white-space: nowrap !important; /* Keeps button text on one line */
+    white-space: nowrap !important; 
     margin: 0 !important;
     padding: 12px 20px !important;
   }

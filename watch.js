@@ -146,7 +146,7 @@ function buildEpisodeRow() {
     if (typeof item === "object" && item.episode) {
       label = item.episode; // e.g., "Ep 1"
     } else if (typeof item === "object" && item.size) {
-      label = `Part ${i + 1} (${item.size}${item.unit})`;
+      label = `Watch (${item.size}${item.unit})`;
     }
 
     const isActive = (i === bingeData.currentIndex) ? "active" : "";

@@ -7,7 +7,7 @@
   <title>NTM Stream • Premium Streaming</title>
 
   <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
-  <link rel="stylesheet" href="watch.css?v=5" />
+  <link rel="stylesheet" href="watch.css?v=6" />
   <link rel="icon" href="logo.png" />
 </head>
 
@@ -37,24 +37,28 @@
   <section class="player-section">
     <div class="player-card" id="playerCardContainer">
 
-      <div class="loading-screen" id="loadingScreen">
-        <div class="loader-ring"></div>
-        <p>Preparing Premium Stream...</p>
-      </div>
+      <div class="video-wrapper">
+        
+        <div class="loading-screen" id="loadingScreen">
+          <div class="loader-ring"></div>
+          <p>Preparing Premium Stream...</p>
+        </div>
 
-      <div class="buffer-loader" id="bufferLoader">
-        <div class="buffer-spinner"></div>
-      </div>
+        <div class="buffer-loader" id="bufferLoader">
+          <div class="buffer-spinner"></div>
+        </div>
 
-      <video 
-        id="videoPlayer" 
-        class="video-js vjs-default-skin vjs-big-play-centered" 
-        controls 
-        preload="auto" 
-        playsinline
-        webkit-playsinline="true"
-        x5-playsinline="true">
-      </video>
+        <video 
+          id="videoPlayer" 
+          class="video-js vjs-default-skin vjs-big-play-centered" 
+          controls 
+          preload="auto" 
+          playsinline
+          webkit-playsinline="true"
+          x5-playsinline="true">
+        </video>
+        
+      </div>
 
       <div class="live-badge" id="liveBadge">● PREMIUM STREAM</div>
 

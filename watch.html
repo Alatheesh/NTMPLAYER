@@ -37,14 +37,9 @@
   <section class="player-section">
     <div class="player-card" id="playerCardContainer">
 
-      <div class="loading-screen" id="loadingScreen" style="display: none !important;">
-        <div class="loader-ring"></div>
-        <p>Preparing Premium Stream...</p>
-      </div>
-
-      <div class="buffer-loader" id="bufferLoader" style="display: none !important;">
-        <div class="buffer-spinner"></div>
-      </div>
+      <div id="loadingScreen" style="display: none !important; pointer-events: none !important; opacity: 0 !important; width: 0; height: 0; z-index: -99 !important;"></div>
+      
+      <div id="bufferLoader" style="display: none !important; pointer-events: none !important; opacity: 0 !important; width: 0; height: 0; z-index: -99 !important;"></div>
 
       <video 
         id="videoPlayer" 

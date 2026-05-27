@@ -7,7 +7,7 @@
   <title>NTM Stream • Premium Streaming</title>
 
   <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
-  <link rel="stylesheet" href="watch.css" />
+  <link rel="stylesheet" href="watch.css?v=5" />
   <link rel="icon" href="logo.png" />
 </head>
 
@@ -37,9 +37,14 @@
   <section class="player-section">
     <div class="player-card" id="playerCardContainer">
 
-      <div id="loadingScreen" style="display: none !important; pointer-events: none !important; opacity: 0 !important; width: 0; height: 0; z-index: -99 !important;"></div>
-      
-      <div id="bufferLoader" style="display: none !important; pointer-events: none !important; opacity: 0 !important; width: 0; height: 0; z-index: -99 !important;"></div>
+      <div class="loading-screen" id="loadingScreen">
+        <div class="loader-ring"></div>
+        <p>Preparing Premium Stream...</p>
+      </div>
+
+      <div class="buffer-loader" id="bufferLoader">
+        <div class="buffer-spinner"></div>
+      </div>
 
       <video 
         id="videoPlayer" 

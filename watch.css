@@ -11,7 +11,8 @@ body {
   overflow-x: hidden;
   min-height: 100vh;
   position: relative;
-  padding-top: 90px;
+  /* 🔥 FIXED: Reduced desktop body padding to exact top-bar height */
+  padding-top: 85px;
 }
 
 /* BACKGROUND ACCENTS */
@@ -145,8 +146,8 @@ body {
 .hero {
   width: 100%;
   text-align: center;
-  /* 🔥 FIXED: Reduced top padding from 90px to 20px to remove desktop buffer */
-  padding: 20px 20px 25px; 
+  /* 🔥 FIXED: ZERO padding on top to kill the buffer entirely */
+  padding: 0px 20px 20px; 
   position: relative;
   z-index: 1;
 }
@@ -170,7 +171,8 @@ body {
 /* CINEMATIC BLADE SHADOW ACCENT */
 .cinematic-blade {
   height: 2px;
-  margin: 30px auto; 
+  /* 🔥 REDUCED margin to prevent hidden empty space */
+  margin: 15px auto; 
   border-radius: 50%;
   background: linear-gradient(90deg, transparent, #00bfff, #8d7cff, transparent);
   box-shadow: 0 0 20px rgba(0, 191, 255, 0.8), 0 0 40px rgba(141, 124, 255, 0.4);
@@ -585,7 +587,8 @@ body {
 
 @media(max-width:768px) {
   body {
-    padding-top: 140px;
+    /* 🔥 FIXED: Reduced mobile body padding from 140px to 85px to kill the giant gap */
+    padding-top: 85px; 
   }
 
   .top-bar {
@@ -610,8 +613,8 @@ body {
   }
 
   .hero {
-    /* 🔥 FIXED: Reduced mobile top padding from 150px to 20px */
-    padding-top: 20px; 
+    /* 🔥 FIXED: ZERO padding on top for mobile to kill the buffer entirely */
+    padding-top: 0px; 
   }
 
   .hero h1 {

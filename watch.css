@@ -207,7 +207,6 @@ body {
     0 0 40px rgba(141, 124, 255, 0.15);
 }
 
-/* 🔥 TELEGRAM IN-APP FULLSCREEN FALLBACK SYSTEM OVERRIDES (FIXED FLEXBOX GRID AGENT) */
 .player-card.web-fullscreen {
   position: fixed !important;
   top: 0 !important;
@@ -221,25 +220,22 @@ body {
   transform: none !important;
   padding: 0 !important;
   margin: 0 !important;
-  
-  /* Forces unified container layout constraints */
   display: flex !important;
   flex-direction: column !important;
   justify-content: space-between !important;
 }
 
-/* 🔥 RESIZES VIDEO BOX DYNAMICALLY TO ACCOMMODATE BOTTOM ROW CONTROLS */
 .player-card.web-fullscreen .video-js {
   flex: 1 !important; 
   height: 100% !important; 
   width: 100% !important;
-  max-height: calc(100dvh - 140px) !important; /* Forces layout to spare explicit pixel depth for buttons underneath */
+  max-height: calc(100dvh - 140px) !important;
   border-radius: 0 !important;
 }
 
 .player-card.web-fullscreen .premium-controls {
   border-radius: 0 !important;
-  margin-top: auto !important; /* Locks controls directly down into the view base edge */
+  margin-top: auto !important; 
 }
 
 .video-js {
@@ -249,13 +245,11 @@ body {
   border-radius: 28px 28px 0 0;
 }
 
-/* VIDEO JS DOCK OVERLAY COMPLIANCE */
 .vjs-control-bar {
   background: rgba(0,0,0,0.72) !important;
   backdrop-filter: blur(12px);
 }
 
-/* 🔥 HIDE NATIVE VIDEO.JS SPINNER TO PREVENT DOUBLE-BUFFERING GHOSTING */
 .video-js .vjs-loading-spinner {
   display: none !important;
 }
@@ -269,11 +263,10 @@ body {
   background: rgba(0,160,255,0.85) !important;
 }
 
-/* 🔥 PREMIUM CONTROLS DOCK - GRID SYMMETRY UPGRADE */
 .premium-controls {
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(6, 1fr); /* Creates 6 balanced visual grid tracks */
+  grid-template-columns: repeat(6, 1fr);
   gap: 12px;
   padding: 24px;
   background: rgba(4, 6, 12, 0.85);
@@ -283,7 +276,6 @@ body {
   border-radius: 0 0 28px 28px;
 }
 
-/* INTERACTIVE CORE CONTROLS LAYOUT */
 .premium-btn,
 .speed-select {
   width: 100%;
@@ -299,15 +291,12 @@ body {
   font-weight: 600;
   color: white;
   cursor: pointer;
-  
-  /* Frosted Glass Treatment Layer */
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.06);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-/* Speed Custom Dropdown Configuration Layout bounds */
 .speed-select {
   appearance: none;
   -webkit-appearance: none;
@@ -320,7 +309,6 @@ body {
   color: white;
 }
 
-/* TRANSITION ACCELERATIONS FOR GENERAL SHORTCUT HOVERS */
 .premium-btn:hover,
 .speed-select:hover {
   background: rgba(255, 255, 255, 0.09);
@@ -328,7 +316,6 @@ body {
   transform: translateY(-2px);
 }
 
-/* 🔥 SPECIAL EMBEDDED CORES (Main Priority Accent Buttons) */
 #playPauseBtn {
   background: linear-gradient(135deg, #007bff, #00bfff) !important;
   border: none !important;
@@ -340,13 +327,11 @@ body {
   transform: translateY(-2px) scale(1.02);
 }
 
-/* 🔥 BUFFERING MASK COMPLETELY REMOVED FROM VIEW 🔥 */
 .loading-screen,
 .buffer-loader {
   display: none !important;
 }
 
-/* SHIELD DISCLAIMER CARD BOX TEXT */
 .premium-disclaimer {
   width: 100%;
   display: flex;
@@ -367,7 +352,6 @@ body {
   color: #cfcfcf;
 }
 
-/* FOOTER BRAND REGISTRY FRAMEWORK */
 .premium-footer {
   width: 100%;
   text-align: center;
@@ -376,7 +360,6 @@ body {
   line-height: 2;
 }
 
-/* 🔥 BRAND STATUS RADIAL BADGE */
 .live-badge {
   position: absolute;
   top: 20px;
@@ -391,7 +374,6 @@ body {
   font-size: 12px;
   z-index: 30;
   pointer-events: none;
-  
   opacity: 1;
   transition: opacity 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
   animation: pulseGlow 2s infinite;
@@ -425,7 +407,6 @@ body {
   box-shadow: 0 0 35px rgba(0,190,255,0.28), 0 0 80px rgba(0,120,255,0.14);
 }
 
-/* SYSTEM TIME LOOPS SEQUENCING KEYFRAMES */
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
@@ -488,7 +469,6 @@ body {
   backdrop-filter: blur(10px);
 }
 
-/* 🚀 NETFLIX-STYLE EPISODE ROW CSS */
 .episode-container {
   display: none; 
   margin-top: 20px;
@@ -531,7 +511,6 @@ body {
   transform: scale(1.05);
 }
 
-/* 📱 HIGHLY RESPONSIVE PHONE LAYOUT MATRIX BREAKPOINTS */
 @media(max-width:900px) {
   .premium-controls {
     grid-template-columns: repeat(3, 1fr); 
@@ -605,11 +584,7 @@ body {
   }
 }
 
-/* =========================================
-   📱 MOBILE LANDSCAPE FULLSCREEN FIX 
-   ========================================= */
 @media (orientation: landscape) and (max-height: 600px) {
-  
   .player-card.web-fullscreen .episode-container,
   .episode-container {
     display: none !important;
@@ -659,4 +634,30 @@ body {
     margin: 0 !important;
     padding: 12px 20px !important;
   }
+}
+
+/* 🔥 INJECTED: CINEMA SWIPE GESTURE UI 🔥 */
+.video-wrapper {
+  position: relative;
+  touch-action: none; /* Stops the browser from scrolling when users adjust volume */
+}
+
+.gesture-feedback {
+  position: absolute; 
+  top: 50%; 
+  left: 50%; 
+  transform: translate(-50%, -50%); 
+  background: rgba(0, 0, 0, 0.7); 
+  color: #00bfff; 
+  padding: 15px 35px; 
+  border-radius: 30px; 
+  font-size: 24px; 
+  font-weight: bold; 
+  pointer-events: none; 
+  opacity: 0; 
+  transition: opacity 0.15s ease;
+  z-index: 9999; 
+  text-shadow: 0 0 15px rgba(0, 191, 255, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }

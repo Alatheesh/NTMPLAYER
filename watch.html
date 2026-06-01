@@ -1,16 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>NTM Stream • Premium Streaming</title>
-
   <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
-  <link rel="stylesheet" href="watch.css?v=6" />
+  <link rel="stylesheet" href="watch.css?v=7" />
   <link rel="icon" href="logo.png" />
 </head>
-
 <body>
 
   <div class="bg-overlay"></div>
@@ -42,12 +39,19 @@
           <div class="loader-ring"></div>
           <p>Preparing Premium Stream...</p>
         </div>
-
         <div class="buffer-loader" id="bufferLoader">
           <div class="buffer-spinner"></div>
         </div>
 
         <div id="gestureFeedback" class="gesture-feedback"></div>
+
+        <div id="resumePrompt" class="resume-prompt">
+          <span>Resume from <strong id="resumeTimeDisplay">00:00</strong>?</span>
+          <div class="resume-actions">
+            <button class="resume-btn" onclick="executeResume()">▶ Resume</button>
+            <button class="resume-dismiss" onclick="dismissResume()">✖</button>
+          </div>
+        </div>
 
         <video 
           id="videoPlayer" 
@@ -65,15 +69,11 @@
       <div class="premium-controls">
         <button onclick="decreaseVolume()" class="premium-btn">🔉 Vol -</button>
         <button onclick="skipBackward()" class="premium-btn">⏪ 10s</button>
-        
         <button id="playPauseBtn" onclick="togglePlay()" class="premium-btn">⏯ Play</button>
         <button onclick="toggleFullscreen()" class="premium-btn">🔲 Fullscreen</button>
-        
         <button onclick="skipForward()" class="premium-btn">10s ⏩</button>
         <button onclick="increaseVolume()" class="premium-btn">🔊 Vol +</button>
-        
         <button onclick="togglePiP()" class="premium-btn" style="grid-column: span 3;">📺 Picture in Picture</button>
-        
         <select id="speedControl" class="speed-select" style="grid-column: span 3;">
           <option value="0.5">0.5x</option>
           <option value="1" selected>1x</option>
@@ -84,7 +84,6 @@
       </div>
 
       <div id="episodeContainer" class="episode-container"></div>
-
     </div>
   </section>
 
@@ -94,8 +93,6 @@
       <h2>Streaming Disclaimer</h2>
       <p>NTM Stream functions solely as a search and indexing interface for publicly available third-party content across the internet.</p>
       <p>We do not host, upload, archive, store, distribute, or modify any media content on our own servers.</p>
-      <p>All streaming content displayed on this platform originates from external providers beyond our control.</p>
-      <p>Users are fully responsible for ensuring their use of this website complies with their local laws and regulations.</p>
       <p class="accept-line">By continuing to access this platform, you acknowledge and agree to this disclaimer.</p>
     </div>
   </section>
@@ -103,7 +100,6 @@
   <footer class="premium-footer">
     <div class="footer-glow"></div>
     <p class="footer-main">© 2026 NTM Stream • All Rights Reserved</p>
-    <p class="footer-sub">Premium cinematic streaming experience designed for entertainment purposes only.</p>
     <div class="footer-links">
       <a href="disclaimer.html">Disclaimer</a>
       <a href="privacy.html">Privacy Policy</a>
@@ -114,6 +110,5 @@
 
   <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
   <script src="watch.js"></script>
-
 </body>
 </html>

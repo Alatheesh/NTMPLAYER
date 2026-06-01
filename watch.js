@@ -1,8 +1,22 @@
-let bingeData = null; let activeVideoKey = ""; let savedResumeTime = 0; let promptTimer = null;
-const player = videojs('videoPlayer', { controls: true, autoplay: false, preload: 'auto', fluid: true, responsive: true });
+// --- INITIALIZE PLAYER WITH PRE-FETCH SUPPORT ---
+const player = videojs('videoPlayer', { 
+  controls: true, 
+  autoplay: true, 
+  preload: 'auto', 
+  fluid: true, 
+  responsive: true,
+  html5: {
+    hls: {
+      overrideNative: true,
+      cacheWithM3U8: true // 🧠 Forces player to use the "pre-warmed" cache chunks
+    }
+  }
+});
+
 const loadingScreen = document.getElementById("loadingScreen"); const bufferLoader = document.getElementById("bufferLoader");
 const playBtn = document.getElementById("playPauseBtn"); const playerCardContainer = document.getElementById("playerCardContainer");
 const liveBadge = document.getElementById("liveBadge"); let badgeTimeout;
+let bingeData = null; let activeVideoKey = ""; let savedResumeTime = 0; let promptTimer = null;
 
 function initPlayer() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -30,7 +44,6 @@ function loadVideoByIndex(index) {
   let link = typeof currentItem === "string" ? currentItem : currentItem.url;
   try { if (!link.startsWith("http")) link = atob(link); } catch(e) {}
   
-  // 🧠 THE FIX: Combine unique Database ID with the Episode Index!
   if (bingeData.id) {
     activeVideoKey = "ntm_id_" + bingeData.id + "_ep_" + index;
   } else {

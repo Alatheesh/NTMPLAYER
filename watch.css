@@ -31,7 +31,7 @@ body { background: #020202; color: white; font-family: Arial, sans-serif; overfl
 .player-card { width: 100%; max-width: 1280px; border-radius: 28px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(16px); position: relative; z-index: 1; box-shadow: 0 0 60px rgba(0,150,255,0.12); animation: fadeUp 1s ease, ambientGlow 8s ease infinite; transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1); }
 .player-card:hover { transform: translateY(-4px) scale(1.005); box-shadow: 0 20px 80px rgba(0, 191, 255, 0.25), 0 0 40px rgba(141, 124, 255, 0.15); }
 
-/* 🔥 FULLSCREEN CENTERING FIX */
+/* FULLSCREEN CENTERING FIX */
 .player-card.web-fullscreen { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100dvh !important; max-width: none !important; border-radius: 0 !important; z-index: 999999 !important; background: #000000 !important; transform: none !important; padding: 0 !important; margin: 0 !important; display: flex !important; flex-direction: column !important; justify-content: space-between !important; }
 .player-card.web-fullscreen .video-wrapper { flex: 1 !important; display: flex !important; align-items: center !important; justify-content: center !important; width: 100% !important; max-height: calc(100dvh - 140px) !important; }
 .player-card.web-fullscreen .video-js { width: 100% !important; height: 100% !important; border-radius: 0 !important; flex: none !important; }
@@ -85,37 +85,23 @@ body { background: #020202; color: white; font-family: Arial, sans-serif; overfl
 @keyframes textShimmer { to { background-position: 200% center; } }
 @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 10px rgba(0,170,255,0.2); } 50% { box-shadow: 0 0 25px rgba(0,170,255,0.45); } }
 
-/* INJECTED: CINEMA SWIPE GESTURE UI */
+/* CINEMA SWIPE GESTURE UI */
 .video-wrapper { position: relative; touch-action: none; }
 .gesture-feedback { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.7); color: #00bfff; padding: 15px 35px; border-radius: 30px; font-size: 24px; font-weight: bold; pointer-events: none; opacity: 0; transition: opacity 0.15s ease; z-index: 9999; text-shadow: 0 0 15px rgba(0, 191, 255, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 
+/* 🔥 SMART RESUME UI 🔥 */
+.resume-prompt { position: absolute; bottom: 80px; left: 30px; background: rgba(10, 15, 30, 0.9); border: 1px solid rgba(0, 191, 255, 0.4); padding: 12px 20px; border-radius: 12px; display: flex; align-items: center; gap: 15px; z-index: 9999; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px); transform: translateY(20px); opacity: 0; pointer-events: none; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.resume-prompt.show { transform: translateY(0); opacity: 1; pointer-events: auto; }
+.resume-prompt span { color: #ddd; font-size: 14px; }
+.resume-prompt strong { color: #00bfff; }
+.resume-actions { display: flex; gap: 8px; }
+.resume-btn { background: #00bfff; color: #000; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+.resume-btn:hover { background: #fff; transform: scale(1.05); }
+.resume-dismiss { background: rgba(255, 255, 255, 0.1); color: #fff; border: none; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+.resume-dismiss:hover { background: rgba(255, 0, 0, 0.6); }
+
 /* RESPONSIVE BREAKPOINTS */
-@media(max-width:900px) {
-  .premium-controls { grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 16px; border-radius: 0 0 20px 20px; }
-  .premium-btn, .speed-select { height: 44px; font-size: 13px; border-radius: 10px; }
-  .player-card.web-fullscreen .video-js { max-height: calc(100dvh - 130px) !important; }
-}
-
-@media(max-width:768px) {
-  body { padding-top: 140px; }
-  .top-bar { padding: 15px 10px; flex-direction: column; gap: 12px; }
-  .top-actions { width: 100%; justify-content: center; flex-wrap: wrap; }
-  .logo span { font-size: 22px; } .logo-img { width: 44px; height: 44px; }
-  .hero { padding-top: 150px; } .hero h1 { font-size: 34px; } .hero p { font-size: 14px; }
-  .video-js { height: 240px; }
-}
-
-@media(max-width:480px) {
-  .premium-controls { grid-template-columns: repeat(2, 1fr); }
-  .player-card.web-fullscreen .video-js { max-height: calc(100dvh - 190px) !important; }
-}
-
-/* MOBILE LANDSCAPE FULLSCREEN FIX */
-@media (orientation: landscape) and (max-height: 600px) {
-  .player-card.web-fullscreen .episode-container, .episode-container { display: none !important; }
-  .player-card.web-fullscreen { flex-direction: column !important; overflow-y: auto !important; overflow-x: hidden !important; }
-  .player-card.web-fullscreen .video-wrapper, .player-card.web-fullscreen .video-js { width: 100vw !important; height: 100dvh !important; min-height: 100dvh !important; flex: 0 0 auto !important; }
-  .player-card.web-fullscreen .premium-controls { width: 100vw !important; height: auto !important; margin-top: 10px !important; padding: 15px 20px 40px 20px !important; flex: 0 0 auto !important; box-sizing: border-box !important; display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; overflow-x: auto !important; gap: 12px !important; -ms-overflow-style: none; scrollbar-width: none; }
-  .player-card.web-fullscreen .premium-controls::-webkit-scrollbar { display: none; }
-  .player-card.web-fullscreen .premium-btn, .player-card.web-fullscreen .speed-select { flex: 0 0 auto !important; width: auto !important; white-space: nowrap !important; margin: 0 !important; padding: 12px 20px !important; }
-}
+@media(max-width:900px) { .premium-controls { grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 16px; border-radius: 0 0 20px 20px; } .premium-btn, .speed-select { height: 44px; font-size: 13px; border-radius: 10px; } .player-card.web-fullscreen .video-js { max-height: calc(100dvh - 130px) !important; } }
+@media(max-width:768px) { body { padding-top: 140px; } .top-bar { padding: 15px 10px; flex-direction: column; gap: 12px; } .top-actions { width: 100%; justify-content: center; flex-wrap: wrap; } .logo span { font-size: 22px; } .logo-img { width: 44px; height: 44px; } .hero { padding-top: 150px; } .hero h1 { font-size: 34px; } .hero p { font-size: 14px; } .video-js { height: 240px; } .resume-prompt { bottom: 60px; left: 10px; right: 10px; justify-content: space-between; } }
+@media(max-width:480px) { .premium-controls { grid-template-columns: repeat(2, 1fr); } .player-card.web-fullscreen .video-js { max-height: calc(100dvh - 190px) !important; } }
+@media (orientation: landscape) and (max-height: 600px) { .player-card.web-fullscreen .episode-container, .episode-container { display: none !important; } .player-card.web-fullscreen { flex-direction: column !important; overflow-y: auto !important; overflow-x: hidden !important; } .player-card.web-fullscreen .video-wrapper, .player-card.web-fullscreen .video-js { width: 100vw !important; height: 100dvh !important; min-height: 100dvh !important; flex: 0 0 auto !important; } .player-card.web-fullscreen .premium-controls { width: 100vw !important; height: auto !important; margin-top: 10px !important; padding: 15px 20px 40px 20px !important; flex: 0 0 auto !important; box-sizing: border-box !important; display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; overflow-x: auto !important; gap: 12px !important; -ms-overflow-style: none; scrollbar-width: none; } .player-card.web-fullscreen .premium-controls::-webkit-scrollbar { display: none; } .player-card.web-fullscreen .premium-btn, .player-card.web-fullscreen .speed-select { flex: 0 0 auto !important; width: auto !important; white-space: nowrap !important; margin: 0 !important; padding: 12px 20px !important; } }

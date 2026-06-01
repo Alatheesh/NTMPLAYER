@@ -30,9 +30,13 @@ function loadVideoByIndex(index) {
   let link = typeof currentItem === "string" ? currentItem : currentItem.url;
   try { if (!link.startsWith("http")) link = atob(link); } catch(e) {}
   
-  // 🧠 FIX: Clear expiry queries to create a stable, non-changing key
-  let cleanLink = link.split('?')[0];
-  activeVideoKey = "ntm_" + cleanLink.substring(cleanLink.length - 35).replace(/[^a-zA-Z0-9]/g, "");
+  // 🧠 THE FIX: Combine unique Database ID with the Episode Index!
+  if (bingeData.id) {
+    activeVideoKey = "ntm_id_" + bingeData.id + "_ep_" + index;
+  } else {
+    let cleanLink = link.split('?')[0];
+    activeVideoKey = "ntm_link_" + cleanLink.substring(cleanLink.length - 30).replace(/[^a-zA-Z0-9]/g, "");
+  }
 
   let type = "video/mp4";
   if (link.includes(".m3u8")) type = "application/x-mpegURL";
@@ -88,7 +92,6 @@ function syncExitFullscreen() {
   }
 }
 
-// 🎛️ BULLETPROOF ESC KEY CONSTRAINTS DETECTOR
 const fsEvents = ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'];
 fsEvents.forEach(evt => { document.addEventListener(evt, () => { if (!(document.fullscreenElement || document.webkitFullscreenElement)) { syncExitFullscreen(); } }); });
 

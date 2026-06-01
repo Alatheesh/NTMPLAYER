@@ -29,31 +29,22 @@ function initPlayer() {
 
   if (dataParam) {
     try {
-      // Save to sessionStorage so it survives page refreshes!
       sessionStorage.setItem("secureStreamData", dataParam);
-      
-      // Unscramble the Base64 package
       let decodedStr = "";
       try { decodedStr = atob(dataParam); } catch(e) { decodedStr = dataParam; }
-      
-      // Fix for special characters (like Telugu names)
       bingeData = JSON.parse(decodeURIComponent(escape(decodedStr)));
-
-      // Erase '?data=' from the address bar instantly to keep it clean!
       window.history.replaceState({}, document.title, window.location.pathname);
     } catch (e) {
       console.error("Failed to parse stream data.", e);
     }
   } 
   else if (linkParam) {
-    // If you paste ?link= directly into the browser, it plays it!
     bingeData = {
       currentIndex: 0,
       playlist: [ linkParam ]
     };
   } 
   else {
-    // Failsafe: Grab from sessionStorage if they refresh the clean page
     let rawData = sessionStorage.getItem("secureStreamData");
     if (rawData) {
       try {
@@ -64,13 +55,11 @@ function initPlayer() {
     }
   }
 
-  // If absolutely no data was found, warn them
   if (!bingeData || !bingeData.playlist || bingeData.playlist.length === 0) {
     showToast("Stream link missing! Go back to the Hub and select a movie.");
     return;
   }
 
-  // Start the first/clicked episode
   loadVideoByIndex(bingeData.currentIndex);
 }
 
@@ -78,16 +67,12 @@ function initPlayer() {
 function loadVideoByIndex(index) {
   if (index < 0 || index >= bingeData.playlist.length) return;
   
-  // Update current index
   bingeData.currentIndex = index;
   const currentItem = bingeData.playlist[index];
   
-  // Extract URL (it might be a string or an object)
   let link = typeof currentItem === "string" ? currentItem : currentItem.url;
 
-  // 🚀 THE FIX: UNSCRAMBLE THE LINK FOR NEW FILES!
   try {
-    // If the link does not start with http, it is scrambled Base64! Unscramble it.
     if (!link.startsWith("http")) {
       link = atob(link);
     }
@@ -95,7 +80,6 @@ function loadVideoByIndex(index) {
     console.error("Link unscramble failed:", e);
   }
 
-  // Determine file type automatically based on the UNSCRAMBLED link
   let type = "video/mp4";
   if (link.includes(".m3u8")) {
     type = "application/x-mpegURL";
@@ -108,7 +92,6 @@ function loadVideoByIndex(index) {
   if (loadingScreen) loadingScreen.style.display = "flex";
   if (bufferLoader) bufferLoader.classList.add("show");
   
-  // Feed URL to Video.js
   player.src({
     src: link,
     type: type
@@ -122,7 +105,6 @@ function loadVideoByIndex(index) {
     if (loadingScreen) loadingScreen.style.display = "none";
   });
 
-  // Re-draw the Netflix Server Row to highlight the active episode
   buildEpisodeRow();
 }
 
@@ -131,7 +113,6 @@ function buildEpisodeRow() {
   const container = document.getElementById("episodeContainer");
   if (!container) return;
 
-  // Hide the row completely if it's just a single movie
   if (bingeData.playlist.length <= 1) {
     container.style.display = "none";
     return;
@@ -144,7 +125,7 @@ function buildEpisodeRow() {
     let label = `Episode ${i + 1}`;
     
     if (typeof item === "object" && item.episode) {
-      label = item.episode; // e.g., "Ep 1"
+      label = item.episode; 
     } else if (typeof item === "object" && item.size) {
       label = `Watch (${item.size}${item.unit})`;
     }
@@ -156,7 +137,6 @@ function buildEpisodeRow() {
 
   container.innerHTML = html;
 
-  // Auto-scroll the row so the active episode button is perfectly in the center!
   setTimeout(() => {
     const activeBtn = container.querySelector('.active');
     if (activeBtn) {
@@ -202,7 +182,7 @@ function skipBackward() {
   showToast("-10 Seconds");
 }
 
-// ---------------- HARD FORCED WEB-FULLSCREEN OVERRIDE & BUTTON TOGGLE ----------------
+// ---------------- HARD FORCED WEB-FULLSCREEN OVERRIDE ----------------
 function toggleFullscreen() {
   if (!playerCardContainer) return;
 
@@ -234,7 +214,7 @@ function toggleFullscreen() {
   }
 }
 
-// FORCE PICTURE-IN-PICTURE (PiP) THROUGH VIDEO.JS INSTANCE
+// FORCE PICTURE-IN-PICTURE (PiP)
 async function togglePiP() {
   const techVideo = player.tech({ IWillNotUseThisInApp: true }) ? player.tech().el_ : null;
   
@@ -277,7 +257,6 @@ function showBadge() {
   liveBadge.classList.remove("hidden");
 }
 
-// Synchronizing state transitions directly with core player interface listeners
 player.on("play", () => {
   if (playBtn) playBtn.innerHTML = "⏸ Pause";
   showBadge();
@@ -316,21 +295,15 @@ if (speedControl) {
 // ---------------- UTILITY CONTROLS ----------------
 function copyStreamLink() {
   if (!bingeData) return;
-  
-  // 🚀 FIXED: We package the ENTIRE season (playlist + current episode) into the share link!
   let scrambledPayload = "";
   
   try {
-    // This safe encoding prevents errors if the movie name has Telugu/Unicode characters
     scrambledPayload = btoa(unescape(encodeURIComponent(JSON.stringify(bingeData))));
   } catch(e) {
-    // Fallback just in case
     scrambledPayload = btoa(JSON.stringify(bingeData));
   }
   
-  // Generate the Master Data URL instead of the single link URL
   const shareableUrl = window.location.origin + window.location.pathname + "?data=" + encodeURIComponent(scrambledPayload);
-  
   navigator.clipboard.writeText(shareableUrl);
   showToast("Full Season Link Copied!");
 }
@@ -355,7 +328,6 @@ player.on("ended", () => {
   showBadge();
 });
 
-// 🚀 NEW: ERROR HANDLING
 player.on("error", () => {
   if (loadingScreen) loadingScreen.style.display = "none";
   if (bufferLoader) bufferLoader.classList.remove("show");
@@ -425,3 +397,88 @@ function showToast(text) {
 }
 
 window.addEventListener("DOMContentLoaded", initPlayer);
+
+// ==========================================
+// 🔥 INJECTED: CINEMA SWIPE ENGINE 🔥
+// ==========================================
+const videoWrapper = document.querySelector('.video-wrapper');
+const gestureFeedback = document.getElementById('gestureFeedback');
+
+let lastTapTime = 0;
+let touchStartY = 0;
+let isRightSideSwipe = false;
+let gestureTimer;
+
+function showGestureFeedback(text) {
+  if (!gestureFeedback) return;
+  gestureFeedback.innerText = text;
+  gestureFeedback.style.opacity = '1';
+  clearTimeout(gestureTimer);
+  gestureTimer = setTimeout(() => { gestureFeedback.style.opacity = '0'; }, 600);
+}
+
+/* ⏩ DOUBLE TAP: Skip & Rewind */
+videoWrapper.addEventListener('touchend', (e) => {
+  // Ignore if they tap Video.js buttons directly
+  if (e.target.closest('.vjs-control-bar') || e.target.closest('.vjs-big-play-button')) return;
+  if (e.changedTouches.length !== 1) return;
+
+  const currentTime = new Date().getTime();
+  const tapLength = currentTime - lastTapTime;
+
+  if (tapLength < 300 && tapLength > 0) {
+    const touchX = e.changedTouches[0].clientX;
+    const videoRect = videoWrapper.getBoundingClientRect();
+    const relativeX = touchX - videoRect.left;
+
+    if (relativeX > videoRect.width / 2) {
+      let newTime = Math.min(player.duration(), player.currentTime() + 10);
+      player.currentTime(newTime);
+      showGestureFeedback("⏩ +10s");
+      pulsePlayer(); 
+    } else {
+      let newTime = Math.max(0, player.currentTime() - 10);
+      player.currentTime(newTime);
+      showGestureFeedback("⏪ -10s");
+      pulsePlayer();
+    }
+    e.preventDefault(); 
+  }
+  lastTapTime = currentTime;
+});
+
+/* 🔊 VERTICAL SWIPE: Volume Control */
+videoWrapper.addEventListener('touchstart', (e) => {
+  if (e.target.closest('.vjs-control-bar') || e.target.closest('.vjs-big-play-button')) return;
+  if (e.touches.length !== 1) return;
+  
+  const touchX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+  const videoRect = videoWrapper.getBoundingClientRect();
+  const relativeX = touchX - videoRect.left;
+
+  isRightSideSwipe = relativeX > (videoRect.width * 0.7);
+}, { passive: true }); 
+
+videoWrapper.addEventListener('touchmove', (e) => {
+  if (!isRightSideSwipe || e.touches.length !== 1) return;
+  
+  // Stops the page from scrolling while user is doing the volume gesture
+  e.preventDefault(); 
+
+  const touchCurrentY = e.touches[0].clientY;
+  const deltaY = touchStartY - touchCurrentY; 
+  
+  const sensitivity = 0.006; 
+  let currentVol = player.volume();
+  let newVolume = currentVol + (deltaY * sensitivity);
+
+  newVolume = Math.max(0, Math.min(1, newVolume));
+  player.volume(newVolume);
+
+  touchStartY = touchCurrentY;
+
+  const volPercent = Math.round(newVolume * 100);
+  showGestureFeedback(`🔊 ${volPercent}%`);
+  
+}, { passive: false });

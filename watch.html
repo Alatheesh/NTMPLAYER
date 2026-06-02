@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>NTM Stream • Premium Streaming</title>
   <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
-  <link rel="stylesheet" href="watch.css?v=8" />
+  <link rel="stylesheet" href="watch.css?v=9" />
   <link rel="icon" href="logo.png" />
 </head>
 <body>
@@ -68,14 +68,13 @@
       <div class="live-badge" id="liveBadge">● PREMIUM STREAM</div>
 
       <div class="premium-controls">
-        <button onclick="decreaseVolume()" class="premium-btn">🔉 Vol -</button>
         <button onclick="skipBackward()" class="premium-btn">⏪ 10s</button>
         <button id="playPauseBtn" onclick="togglePlay()" class="premium-btn">⏯ Play</button>
-        <button onclick="toggleFullscreen()" class="premium-btn">🔲 Fullscreen</button>
         <button onclick="skipForward()" class="premium-btn">10s ⏩</button>
-        <button onclick="increaseVolume()" class="premium-btn">🔊 Vol +</button>
-        <button onclick="togglePiP()" class="premium-btn" style="grid-column: span 3;">📺 Picture in Picture</button>
+        <button onclick="toggleFullscreen()" class="premium-btn">🔲 Fullscreen</button>
+        <button id="audioBoosterBtn" onclick="toggleAudioBooster()" class="premium-btn" style="grid-column: span 2;">🚀 Boost: OFF</button>
         
+        <button onclick="togglePiP()" class="premium-btn" style="grid-column: span 3;">📺 Picture in Picture</button>
         <select id="speedControl" class="speed-select" style="grid-column: span 3;">
           <option value="0.5">0.5x</option>
           <option value="1" selected>1x</option>
@@ -86,6 +85,24 @@
       </div>
 
       <div id="episodeContainer" class="episode-container"></div>
+      
+      <div class="player-instructions">
+        <h3>🎮 How to use the player</h3>
+        
+        <ul class="desktop-instructions">
+          <li><span>Spacebar</span> Play / Pause</li>
+          <li><span>➔ / ⬅</span> Skip +10s / -10s</li>
+          <li><span>⬆ / ⬇</span> Volume Up / Down</li>
+          <li><span>F</span> Toggle Fullscreen</li>
+        </ul>
+
+        <ul class="mobile-instructions">
+          <li><span>Double Tap (Right)</span> Skip +10 Seconds</li>
+          <li><span>Double Tap (Left)</span> Skip -10 Seconds</li>
+          <li><span>Swipe Up/Down (Right Side)</span> Adjust Volume</li>
+        </ul>
+      </div>
+
     </div>
   </section>
 

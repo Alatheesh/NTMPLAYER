@@ -99,7 +99,6 @@ function syncExitFullscreen() {
     const fsBtn = document.querySelector("button[onclick='toggleFullscreen()']");
     if (fsBtn) fsBtn.innerHTML = "🔲 Fullscreen";
     
-    // Safely hide the exit button when back in normal mode
     const exitBtn = document.getElementById("floatingExitBtn");
     if (exitBtn) exitBtn.classList.remove("visible");
   }

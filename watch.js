@@ -16,6 +16,58 @@ const playBtn = document.getElementById("playPauseBtn"); const playerCardContain
 const liveBadge = document.getElementById("liveBadge"); let badgeTimeout;
 let bingeData = null; let activeVideoKey = ""; let savedResumeTime = 0; let promptTimer = null;
 
+// --- WEB AUDIO API BOOSTER VARIABLES ---
+let audioCtx = null;
+let gainNode = null;
+let audioSourceNode = null;
+let isBoosterActive = false;
+
+function setupAudioBooster() {
+  if (audioCtx) return; 
+  const videoEl = player.tech({ IWillNotUseThisInApp: true }) ? player.tech().el_ : null;
+  if (!videoEl) return;
+
+  try {
+    videoEl.crossOrigin = "anonymous";
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    gainNode = audioCtx.createGain();
+    audioSourceNode = audioCtx.createMediaElementSource(videoEl);
+    
+    audioSourceNode.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    
+    gainNode.gain.value = 1.0; 
+  } catch (e) {
+    console.error("Audio Booster setup bypassed (Check server CORS access):", e);
+  }
+}
+
+function toggleAudioBooster() {
+  isBoosterActive = !isBoosterActive;
+  const btn = document.getElementById("audioBoosterBtn");
+  
+  if (isBoosterActive) {
+    if (!audioCtx) setupAudioBooster();
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    
+    if (gainNode) gainNode.gain.value = 3.0; // Engage 300% Multiplier
+    
+    if (btn) {
+      btn.innerHTML = "🚀 Boost: ON";
+      btn.classList.add("active");
+    }
+    showToast("🚀 Audio Boosted to 300%");
+  } else {
+    if (gainNode) gainNode.gain.value = 1.0; // Return to standard output
+    
+    if (btn) {
+      btn.innerHTML = "🚀 Boost: OFF";
+      btn.classList.remove("active");
+    }
+    showToast("🔊 Audio Normal");
+  }
+}
+
 function initPlayer() {
   const urlParams = new URLSearchParams(window.location.search);
   const dataParam = urlParams.get('data'); const linkParam = urlParams.get('link');
@@ -77,8 +129,6 @@ function buildEpisodeRow() {
 }
 
 function togglePlay() { player.paused() ? (player.play(), showToast("Playing")) : (player.pause(), showToast("Paused")); }
-function increaseVolume() { player.volume(Math.min(player.volume() + 0.1, 1.0)); showToast("Volume: " + Math.round(player.volume() * 100) + "%"); }
-function decreaseVolume() { player.volume(Math.max(player.volume() - 0.1, 0.0)); showToast("Volume: " + Math.round(player.volume() * 100) + "%"); }
 function skipForward() { player.currentTime(player.currentTime() + 10); pulsePlayer(); showToast("+10 Seconds"); }
 function skipBackward() { player.currentTime(player.currentTime() - 10); pulsePlayer(); showToast("-10 Seconds"); }
 
@@ -146,9 +196,25 @@ player.on("error", () => { if (loadingScreen) loadingScreen.style.display = "non
 
 document.addEventListener("keydown", (e) => {
   if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'SELECT') return;
-  if (e.code === "Space") { e.preventDefault(); togglePlay(); } if (e.code === "ArrowRight") skipForward(); if (e.code === "ArrowLeft") skipBackward();
-  if (e.code === "ArrowUp") { e.preventDefault(); increaseVolume(); } if (e.code === "ArrowDown") { e.preventDefault(); decreaseVolume(); } if (e.key.toLowerCase() === "f") { e.preventDefault(); toggleFullscreen(); }
+  if (e.code === "Space") { e.preventDefault(); togglePlay(); } 
+  if (e.code === "ArrowRight") skipForward(); 
+  if (e.code === "ArrowLeft") skipBackward();
+  
+  // Normal Laptop Volume Controls
+  if (e.code === "ArrowUp") { 
+    e.preventDefault(); 
+    player.volume(Math.min(player.volume() + 0.1, 1.0)); 
+    showToast("Volume: " + Math.round(player.volume() * 100) + "%"); 
+  } 
+  if (e.code === "ArrowDown") { 
+    e.preventDefault(); 
+    player.volume(Math.max(player.volume() - 0.1, 0.0)); 
+    showToast("Volume: " + Math.round(player.volume() * 100) + "%"); 
+  } 
+  
+  if (e.key.toLowerCase() === "f") { e.preventDefault(); toggleFullscreen(); }
 });
+
 function pulsePlayer() { if (!playerCardContainer) return; playerCardContainer.style.transform = "scale(1.005)"; setTimeout(() => { playerCardContainer.style.transform = "scale(1)"; }, 150); }
 function showToast(t) {
   const oldToast = document.querySelector(".custom-toast"); if (oldToast) oldToast.remove();
@@ -158,7 +224,7 @@ function showToast(t) {
 window.addEventListener("DOMContentLoaded", initPlayer);
 
 // ==========================================
-// 🎬 CINEMA SWIPE ENGINE
+// 🎬 CINEMA SWIPE ENGINE (Normal Volume Only)
 // ==========================================
 const videoWrapper = document.querySelector('.video-wrapper'); const gestureFeedback = document.getElementById('gestureFeedback');
 let lastTapTime = 0; let touchStartY = 0; let isRightSideSwipe = false; let gestureTimer;
@@ -182,8 +248,14 @@ videoWrapper.addEventListener('touchstart', (e) => {
   touchStartY = e.touches[0].clientY; const videoRect = videoWrapper.getBoundingClientRect();
   isRightSideSwipe = (e.touches[0].clientX - videoRect.left) > (videoRect.width * 0.7);
 }, { passive: true });
+
 videoWrapper.addEventListener('touchmove', (e) => {
   if (!isRightSideSwipe || e.touches.length !== 1) return; e.preventDefault();
-  const touchCurrentY = e.touches[0].clientY; let nVol = player.volume() + ((touchStartY - touchCurrentY) * 0.006);
-  nVol = Math.max(0, Math.min(1, nVol)); player.volume(nVol); touchStartY = touchCurrentY; showGestureFeedback(`🔊 ${Math.round(nVol * 100)}%`);
+  const touchCurrentY = e.touches[0].clientY; 
+  let delta = (touchStartY - touchCurrentY) * 0.006; 
+  let nVol = Math.max(0, Math.min(1, player.volume() + delta)); // Locks swipe volume between 0 and 100%
+  
+  player.volume(nVol); 
+  touchStartY = touchCurrentY; 
+  showGestureFeedback(`🔊 ${Math.round(nVol * 100)}%`);
 }, { passive: false });

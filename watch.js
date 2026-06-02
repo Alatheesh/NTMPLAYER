@@ -77,8 +77,6 @@ function buildEpisodeRow() {
 }
 
 function togglePlay() { player.paused() ? (player.play(), showToast("Playing")) : (player.pause(), showToast("Paused")); }
-function increaseVolume() { player.volume(Math.min(player.volume() + 0.1, 1.0)); showToast("Volume: " + Math.round(player.volume() * 100) + "%"); }
-function decreaseVolume() { player.volume(Math.max(player.volume() - 0.1, 0.0)); showToast("Volume: " + Math.round(player.volume() * 100) + "%"); }
 function skipForward() { player.currentTime(player.currentTime() + 10); pulsePlayer(); showToast("+10 Seconds"); }
 function skipBackward() { player.currentTime(player.currentTime() - 10); pulsePlayer(); showToast("-10 Seconds"); }
 
@@ -100,6 +98,10 @@ function syncExitFullscreen() {
     playerCardContainer.classList.remove("web-fullscreen");
     const fsBtn = document.querySelector("button[onclick='toggleFullscreen()']");
     if (fsBtn) fsBtn.innerHTML = "🔲 Fullscreen";
+    
+    // Safely hide the exit button when back in normal mode
+    const exitBtn = document.getElementById("floatingExitBtn");
+    if (exitBtn) exitBtn.classList.remove("visible");
   }
 }
 
@@ -113,8 +115,21 @@ async function togglePiP() {
 
 function hideBadgeAfterDelay() { if (!liveBadge) return; clearTimeout(badgeTimeout); badgeTimeout = setTimeout(() => { if (!player.paused()) liveBadge.classList.add("hidden"); }, 3000); }
 function showBadge() { if (!liveBadge) return; clearTimeout(badgeTimeout); liveBadge.classList.remove("hidden"); }
+
 player.on("play", () => { if (playBtn) playBtn.innerHTML = "⏸ Pause"; showBadge(); hideBadgeAfterDelay(); });
 player.on("pause", () => { if (playBtn) playBtn.innerHTML = "⏯ Play"; showBadge(); }); player.on("seeking", () => { showBadge(); hideBadgeAfterDelay(); });
+
+// --- AUTO-HIDE FLOATING CLOSE BUTTON ON SCREEN TAP ---
+player.on('useractive', () => {
+  const btn = document.getElementById("floatingExitBtn");
+  if (btn && playerCardContainer && playerCardContainer.classList.contains("web-fullscreen")) {
+    btn.classList.add("visible");
+  }
+});
+player.on('userinactive', () => {
+  const btn = document.getElementById("floatingExitBtn");
+  if (btn) btn.classList.remove("visible");
+});
 
 const speedControl = document.getElementById("speedControl");
 if (speedControl) { speedControl.addEventListener("change", (e) => { player.playbackRate(Number(e.target.value)); showToast("Speed: " + e.target.value + "x"); }); }
@@ -150,7 +165,6 @@ document.addEventListener("keydown", (e) => {
   if (e.code === "ArrowRight") skipForward(); 
   if (e.code === "ArrowLeft") skipBackward();
   
-  // Clean Native Volume Controls restored for keyboard
   if (e.code === "ArrowUp") { 
     e.preventDefault(); 
     player.volume(Math.min(player.volume() + 0.1, 1.0)); 

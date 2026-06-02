@@ -31,11 +31,57 @@ body { background: #020202; color: white; font-family: Arial, sans-serif; overfl
 .player-card { width: 100%; max-width: 1280px; border-radius: 28px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(16px); position: relative; z-index: 1; box-shadow: 0 0 60px rgba(0,150,255,0.12); animation: fadeUp 1s ease, ambientGlow 8s ease infinite; transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1); }
 .player-card:hover { transform: translateY(-4px) scale(1.005); box-shadow: 0 20px 80px rgba(0, 191, 255, 0.25), 0 0 40px rgba(141, 124, 255, 0.15); }
 
-/* FULLSCREEN CENTERING FIX */
+/* =========================================
+   🔥 FULLSCREEN FIX & AUTO-HIDE LOGIC
+   ========================================= */
 .player-card.web-fullscreen { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100dvh !important; max-width: none !important; border-radius: 0 !important; z-index: 999999 !important; background: #000000 !important; transform: none !important; padding: 0 !important; margin: 0 !important; display: flex !important; flex-direction: column !important; justify-content: space-between !important; }
-.player-card.web-fullscreen .video-wrapper { flex: 1 !important; display: flex !important; align-items: center !important; justify-content: center !important; width: 100% !important; max-height: calc(100dvh - 140px) !important; background: #000 !important; }
+.player-card.web-fullscreen .video-wrapper { flex: 1 !important; display: flex !important; align-items: center !important; justify-content: center !important; width: 100% !important; max-height: 100vh !important; background: #000 !important; }
 .player-card.web-fullscreen .video-js { width: 100% !important; height: 100% !important; border-radius: 0 !important; flex: none !important; max-height: 100% !important; }
-.player-card.web-fullscreen .premium-controls { border-radius: 0 !important; margin-top: auto !important; }
+
+/* Completely hide clutter when fullscreen */
+.player-card.web-fullscreen .premium-controls,
+.player-card.web-fullscreen .player-instructions,
+.player-card.web-fullscreen .episode-container {
+  display: none !important;
+}
+
+/* 🔥 THE FLOATING EXIT TRICK (WITH AUTO-HIDE) */
+.floating-exit-btn {
+  display: none;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 999999;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  color: white;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  align-items: center;
+  gap: 5px;
+  
+  /* Starts invisible and unclickable */
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.floating-exit-btn:hover { background: rgba(255, 0, 0, 0.6); border-color: #ff4d4d; }
+
+/* Becomes flex in fullscreen, but remains hidden until user is active */
+.player-card.web-fullscreen .floating-exit-btn { display: flex; }
+
+/* The JS adds this class when the user taps/moves mouse */
+.player-card.web-fullscreen .floating-exit-btn.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
 
 /* VIDEO JS OVERRIDES */
 .video-js { width: 100%; height: 720px; background: black; border-radius: 28px 28px 0 0; }
@@ -43,22 +89,14 @@ body { background: #020202; color: white; font-family: Arial, sans-serif; overfl
 .video-js .vjs-loading-spinner { display: none !important; }
 .vjs-big-play-button { border: none !important; border-radius: 50% !important; width: 100px !important; height: 100px !important; line-height: 100px !important; background: rgba(0,160,255,0.85) !important; }
 
-/* PREMIUM CONTROLS */
-.premium-controls { width: 100%; display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; padding: 24px; background: rgba(4, 6, 12, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(255, 255, 255, 0.05); border-radius: 0 0 28px 28px; }
+/* PREMIUM CONTROLS (4 Buttons) */
+.premium-controls { width: 100%; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 24px; background: rgba(4, 6, 12, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(255, 255, 255, 0.05); border-radius: 0 0 28px 28px; }
 .premium-btn, .speed-select { width: 100%; height: 48px; border: none; outline: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 12px; font-size: 14px; font-weight: 600; color: white; cursor: pointer; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05); transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
 .speed-select { appearance: none; -webkit-appearance: none; text-align: center; padding-left: 10px; }
 .speed-select option { background: #070b14; color: white; }
 .premium-btn:hover, .speed-select:hover { background: rgba(255, 255, 255, 0.09); border-color: rgba(255, 255, 255, 0.2); transform: translateY(-2px); }
 #playPauseBtn { background: linear-gradient(135deg, #007bff, #00bfff) !important; border: none !important; box-shadow: 0 4px 15px rgba(0, 191, 255, 0.3); }
 #playPauseBtn:hover { box-shadow: 0 6px 20px rgba(0, 191, 255, 0.5); transform: translateY(-2px) scale(1.02); }
-
-/* 🔥 AUDIO BOOSTER ACTIVE STATE */
-#audioBoosterBtn.active {
-  background: rgba(255, 77, 77, 0.2) !important;
-  border-color: #ff4d4d !important;
-  color: #ff4d4d !important;
-  box-shadow: 0 0 15px rgba(255, 77, 77, 0.4) !important;
-}
 
 /* ALERTS & BADGES */
 .loading-screen, .buffer-loader { display: none !important; }
@@ -74,36 +112,20 @@ body { background: #020202; color: white; font-family: Arial, sans-serif; overfl
 .ep-btn:hover { background: #222; color: #fff; border-color: #555; }
 .ep-btn.active { background: rgba(0, 191, 255, 0.1); border-color: #00bfff; color: #00bfff; box-shadow: 0 0 15px rgba(0, 191, 255, 0.3); transform: scale(1.05); }
 
-/* =========================================
-   🎮 SMART PLAYER INSTRUCTIONS
-   ========================================= */
-.player-instructions { 
-  margin: 20px 24px 24px; 
-  padding: 20px; 
-  background: rgba(255, 255, 255, 0.04); 
-  backdrop-filter: blur(10px); 
-  border: 1px solid rgba(255, 255, 255, 0.08); 
-  border-radius: 16px; 
-  color: #ccc; 
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); 
-}
+/* SMART INSTRUCTIONS */
+.player-instructions { margin: 20px 24px 24px; padding: 20px; background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; color: #ccc; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
 .player-instructions h3 { margin-top: 0; color: #00bfff; font-size: 16px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
 .player-instructions ul { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .player-instructions li { background: rgba(0, 0, 0, 0.4); padding: 12px; border-radius: 10px; display: flex; align-items: center; gap: 12px; font-size: 13px; border: 1px solid rgba(255,255,255,0.03); }
 .player-instructions span { background: rgba(0, 191, 255, 0.15); color: #00bfff; padding: 5px 10px; border-radius: 6px; font-weight: bold; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid rgba(0, 191, 255, 0.3); }
 
-/* DEFAULT TO DESKTOP VIEW */
 .mobile-instructions { display: none !important; }
 .desktop-instructions { display: grid; }
-
-/* SMART DETECT: TOUCH SCREENS (Mobiles/Tablets) */
 @media (pointer: coarse) {
   .desktop-instructions { display: none !important; }
   .mobile-instructions { display: grid !important; }
 }
-@media (max-width: 650px) {
-  .player-instructions ul { grid-template-columns: 1fr; }
-}
+@media (max-width: 650px) { .player-instructions ul { grid-template-columns: 1fr; } }
 
 /* DISCLAIMER & FOOTER */
 .premium-disclaimer { width: 100%; display: flex; justify-content: center; padding: 70px 20px; }
@@ -113,7 +135,7 @@ body { background: #020202; color: white; font-family: Arial, sans-serif; overfl
 .footer-links a { color: #9fdfff; text-decoration: none; transition: 0.3s; }
 .footer-links a:hover { color: white; text-shadow: 0 0 10px rgba(0,190,255,0.4); }
 
-/* ANIMATIONS */
+/* ANIMATIONS & GESTURES */
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 @keyframes particlesMove { from { transform: translateY(0); } to { transform: translateY(-40px); } }
 @keyframes ambientMove { 0% { transform: translate(0,0); } 50% { transform: translate(120px,80px); } 100% { transform: translate(0,0); } }
@@ -124,11 +146,10 @@ body { background: #020202; color: white; font-family: Arial, sans-serif; overfl
 @keyframes textShimmer { to { background-position: 200% center; } }
 @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 10px rgba(0,170,255,0.2); } 50% { box-shadow: 0 0 25px rgba(0,170,255,0.45); } }
 
-/* CINEMA SWIPE GESTURE UI */
 .video-wrapper { position: relative; touch-action: none; }
 .gesture-feedback { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.7); color: #00bfff; padding: 15px 35px; border-radius: 30px; font-size: 24px; font-weight: bold; pointer-events: none; opacity: 0; transition: opacity 0.15s ease; z-index: 999999; text-shadow: 0 0 15px rgba(0, 191, 255, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 
-/* 🔥 SMART RESUME UI 🔥 */
+/* RESUME UI */
 .resume-prompt { position: absolute; bottom: 80px; left: 30px; background: rgba(10, 15, 30, 0.9); border: 1px solid rgba(0, 191, 255, 0.4); padding: 12px 20px; border-radius: 12px; display: flex; align-items: center; gap: 15px; z-index: 999999; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px); transform: translateY(20px); opacity: 0; pointer-events: none; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 .resume-prompt.show { transform: translateY(0); opacity: 1; pointer-events: auto; }
 .resume-prompt span { color: #ddd; font-size: 14px; }
@@ -140,7 +161,24 @@ body { background: #020202; color: white; font-family: Arial, sans-serif; overfl
 .resume-dismiss:hover { background: rgba(255, 0, 0, 0.6); }
 
 /* RESPONSIVE BREAKPOINTS */
-@media(max-width:900px) { .premium-controls { grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 16px; border-radius: 0 0 20px 20px; } .premium-btn, .speed-select { height: 44px; font-size: 13px; border-radius: 10px; } .player-card.web-fullscreen .video-wrapper { max-height: calc(100dvh - 130px) !important; } }
-@media(max-width:768px) { body { padding-top: 140px; } .top-bar { padding: 15px 10px; flex-direction: column; gap: 12px; } .top-actions { width: 100%; justify-content: center; flex-wrap: wrap; } .logo span { font-size: 22px; } .logo-img { width: 44px; height: 44px; } .hero { padding-top: 150px; } .hero h1 { font-size: 34px; } .hero p { font-size: 14px; } .video-js { height: 240px; } .resume-prompt { bottom: 60px; left: 10px; right: 10px; justify-content: space-between; } }
-@media(max-width:480px) { .premium-controls { grid-template-columns: repeat(2, 1fr); } .player-card.web-fullscreen .video-wrapper { max-height: calc(100dvh - 190px) !important; } }
-@media (orientation: landscape) and (max-height: 600px) { .player-card.web-fullscreen .episode-container, .episode-container { display: none !important; } .player-card.web-fullscreen { flex-direction: column !important; overflow-y: auto !important; overflow-x: hidden !important; } .player-card.web-fullscreen .video-wrapper, .player-card.web-fullscreen .video-js { width: 100vw !important; height: 100dvh !important; min-height: 100dvh !important; flex: 0
+@media(max-width:900px) { 
+  .premium-controls { grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 16px; border-radius: 0 0 20px 20px; } 
+  .premium-btn, .speed-select { height: 44px; font-size: 14px; border-radius: 10px; } 
+}
+@media(max-width:768px) { 
+  body { padding-top: 140px; } 
+  .top-bar { padding: 15px 10px; flex-direction: column; gap: 12px; } 
+  .top-actions { width: 100%; justify-content: center; flex-wrap: wrap; } 
+  .logo span { font-size: 22px; } 
+  .logo-img { width: 44px; height: 44px; } 
+  .hero { padding-top: 150px; } 
+  .hero h1 { font-size: 34px; } 
+  .hero p { font-size: 14px; } 
+  .video-js { height: 240px; } 
+  .resume-prompt { bottom: 60px; left: 10px; right: 10px; justify-content: space-between; } 
+}
+
+/* Landscape Mobile Fix: Ensure menus stay hidden in fullscreen */
+@media (orientation: landscape) and (max-height: 600px) { 
+  .episode-container { display: none !important; } 
+}

@@ -40,6 +40,7 @@ body { background: #020202; color: white; font-family: Arial, sans-serif; overfl
 
 /* Completely hide clutter when fullscreen */
 .player-card.web-fullscreen .premium-controls,
+.player-card.web-fullscreen .download-action-banner,
 .player-card.web-fullscreen .player-instructions,
 .player-card.web-fullscreen .episode-container {
   display: none !important;
@@ -81,13 +82,60 @@ body { background: #020202; color: white; font-family: Arial, sans-serif; overfl
 .vjs-big-play-button { border: none !important; border-radius: 50% !important; width: 100px !important; height: 100px !important; line-height: 100px !important; background: rgba(0,160,255,0.85) !important; }
 
 /* PREMIUM CONTROLS (4 Buttons) */
-.premium-controls { width: 100%; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 24px; background: rgba(4, 6, 12, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(255, 255, 255, 0.05); border-radius: 0 0 28px 28px; }
+.premium-controls { width: 100%; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 24px; background: rgba(4, 6, 12, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(255, 255, 255, 0.05); border-radius: 0 0 0 0; }
 .premium-btn, .speed-select { width: 100%; height: 48px; border: none; outline: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 12px; font-size: 14px; font-weight: 600; color: white; cursor: pointer; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05); transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
 .speed-select { appearance: none; -webkit-appearance: none; text-align: center; padding-left: 10px; }
 .speed-select option { background: #070b14; color: white; }
 .premium-btn:hover, .speed-select:hover { background: rgba(255, 255, 255, 0.09); border-color: rgba(255, 255, 255, 0.2); transform: translateY(-2px); }
 #playPauseBtn { background: linear-gradient(135deg, #007bff, #00bfff) !important; border: none !important; box-shadow: 0 4px 15px rgba(0, 191, 255, 0.3); }
 #playPauseBtn:hover { box-shadow: 0 6px 20px rgba(0, 191, 255, 0.5); transform: translateY(-2px) scale(1.02); }
+
+/* =========================================
+   ⬇ COOL DOWNLOAD BUTTON
+   ========================================= */
+.download-action-banner {
+  width: 100%;
+  padding: 15px 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(4, 6, 12, 0.85);
+  border-radius: 0 0 28px 28px;
+}
+
+.glow-download-btn {
+  background: linear-gradient(90deg, #ff007f, #7928ca);
+  color: white;
+  border: none;
+  padding: 14px 35px;
+  border-radius: 30px;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 0 20px rgba(121, 40, 202, 0.4);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.glow-download-btn .icon {
+  font-size: 18px;
+}
+
+.glow-download-btn:hover {
+  transform: scale(1.05) translateY(-3px);
+  box-shadow: 0 10px 30px rgba(255, 0, 127, 0.6);
+  background: linear-gradient(90deg, #ff1a8c, #8c3ce3);
+}
+
+.glow-download-btn:active {
+  transform: scale(0.98);
+  box-shadow: 0 5px 15px rgba(121, 40, 202, 0.4);
+}
 
 /* ALERTS & BADGES */
 .loading-screen, .buffer-loader { display: none !important; }
@@ -198,7 +246,7 @@ body { background: #020202; color: white; font-family: Arial, sans-serif; overfl
 
 /* RESPONSIVE BREAKPOINTS */
 @media(max-width:900px) { 
-  .premium-controls { grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 16px; border-radius: 0 0 20px 20px; } 
+  .premium-controls { grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 16px; } 
   .premium-btn, .speed-select { height: 44px; font-size: 14px; border-radius: 10px; } 
 }
 @media(max-width:768px) { 

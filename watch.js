@@ -24,7 +24,7 @@ function initPlayer() {
       sessionStorage.setItem("secureStreamData", dataParam);
       let decodedStr = ""; try { decodedStr = atob(dataParam); } catch(e) { decodedStr = dataParam; }
       bingeData = JSON.parse(decodeURIComponent(escape(decodedStr)));
-      window.history.replaceState({}, document.title, window.location.pathname);
+      // Note: We don't clean the URL here anymore so the loadedmetadata event can catch the '?t=' parameter
     } catch (e) { console.error("Failed to parse stream data.", e); }
   } else if (linkParam) {
     bingeData = { currentIndex: 0, playlist: [ linkParam ] };
@@ -133,10 +133,26 @@ player.on('userinactive', () => {
 const speedControl = document.getElementById("speedControl");
 if (speedControl) { speedControl.addEventListener("change", (e) => { player.playbackRate(Number(e.target.value)); showToast("Speed: " + e.target.value + "x"); }); }
 
+// ==========================================
+// 🔗 SMART COPY STREAM LINK
+// ==========================================
 function copyStreamLink() {
-  if (!bingeData) return; let scrambledPayload = "";
-  try { scrambledPayload = btoa(unescape(encodeURIComponent(JSON.stringify(bingeData)))); } catch(e) { scrambledPayload = btoa(JSON.stringify(bingeData)); }
-  navigator.clipboard.writeText(window.location.origin + window.location.pathname + "?data=" + encodeURIComponent(scrambledPayload)); showToast("Link Copied!");
+  if (!bingeData) return; 
+  let scrambledPayload = "";
+  try { 
+    scrambledPayload = btoa(unescape(encodeURIComponent(JSON.stringify(bingeData)))); 
+  } catch(e) { 
+    scrambledPayload = btoa(JSON.stringify(bingeData)); 
+  }
+  
+  // Grab the exact time the user is at
+  let currentTime = Math.floor(player.currentTime() || 0);
+  
+  // Build the smart URL with the timestamp
+  let finalUrl = window.location.origin + window.location.pathname + "?data=" + encodeURIComponent(scrambledPayload) + "&t=" + currentTime;
+  
+  navigator.clipboard.writeText(finalUrl); 
+  showToast("Link & Timestamp Copied! Paste in Browser.");
 }
 
 function showResumePrompt(timeInSeconds) {
@@ -147,10 +163,34 @@ function executeResume() { player.currentTime(savedResumeTime); player.play(); d
 function dismissResume() { const prompt = document.getElementById('resumePrompt'); if(prompt) prompt.classList.remove('show'); clearTimeout(promptTimer); }
 function formatTime(s) { const h = Math.floor(s / 3600); const m = Math.floor((s % 3600) / 60); const sec = Math.floor(s % 60); return h > 0 ? `${h}:${m.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}` : `${m}:${sec.toString().padStart(2,'0')}`; }
 
+// ==========================================
+// 🚀 SMART RESUME & METADATA LOAD
+// ==========================================
 player.on('loadedmetadata', () => {
-  if (loadingScreen) loadingScreen.style.display = "none"; showToast("Stream Ready"); hideBadgeAfterDelay();
+  if (loadingScreen) loadingScreen.style.display = "none"; 
+  showToast("Stream Ready"); 
+  hideBadgeAfterDelay();
+  
   const history = JSON.parse(localStorage.getItem('ntm_watch_history')) || {};
-  if (history[activeVideoKey] && history[activeVideoKey] > 10 && history[activeVideoKey] < player.duration() - 30) { showResumePrompt(history[activeVideoKey]); }
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlTime = parseInt(urlParams.get('t'));
+  
+  // 1. SMART RESUME: If they pasted a link with a timestamp, jump exactly there immediately
+  if (urlTime && urlTime > 0) {
+    player.currentTime(urlTime);
+    player.play();
+    showToast("Resumed from copied link 🚀");
+    
+    // Clean the URL so if they refresh, it doesn't force them back to this time again
+    window.history.replaceState({}, document.title, window.location.pathname + "?data=" + urlParams.get('data'));
+  } 
+  // 2. STANDARD RESUME: Otherwise, check local storage history like normal
+  else if (history[activeVideoKey] && history[activeVideoKey] > 10 && history[activeVideoKey] < player.duration() - 30) { 
+    showResumePrompt(history[activeVideoKey]); 
+  } else {
+    // If no resume needed, still clean the URL for a polished look
+    if(urlParams.get('data')) window.history.replaceState({}, document.title, window.location.pathname + "?data=" + urlParams.get('data'));
+  }
 });
 
 player.on('timeupdate', () => { const cTime = player.currentTime(); if (cTime > 5 && Math.floor(cTime) % 5 === 0) { const history = JSON.parse(localStorage.getItem('ntm_watch_history')) || {}; history[activeVideoKey] = Math.floor(cTime); localStorage.setItem('ntm_watch_history', JSON.stringify(history)); } });
@@ -268,3 +308,34 @@ function downloadCurrentVideo() {
   a.click();
   document.body.removeChild(a);
 }
+
+// ==========================================
+// 🚀 TELEGRAM ENVIRONMENT DETECTION
+// ==========================================
+function checkTelegramEnvironment() {
+  // 1. Check User Agent for Telegram's in-app browser
+  const isTelegramUserAgent = navigator.userAgent.toLowerCase().includes("telegram");
+  
+  // 2. Check for Telegram Mini App specific window object
+  const isTelegramWebApp = window.Telegram && window.Telegram.WebApp;
+
+  if (isTelegramUserAgent || isTelegramWebApp) {
+    const warningBanner = document.getElementById("telegramWarning");
+    if (warningBanner) {
+      warningBanner.style.display = "flex";
+      // Add a class to body to push content down slightly
+      document.body.classList.add("telegram-active");
+    }
+  }
+}
+
+function closeTelegramWarning() {
+  const warningBanner = document.getElementById("telegramWarning");
+  if (warningBanner) {
+    warningBanner.style.display = "none";
+    document.body.classList.remove("telegram-active");
+  }
+}
+
+// Run the check as soon as the page loads
+window.addEventListener("DOMContentLoaded", checkTelegramEnvironment);

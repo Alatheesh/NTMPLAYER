@@ -222,3 +222,49 @@ videoWrapper.addEventListener('touchmove', (e) => {
   touchStartY = touchCurrentY; 
   showGestureFeedback(`🔊 ${Math.round(nVol * 100)}%`);
 }, { passive: false });
+
+// ==========================================
+// ⬇ DYNAMIC DOWNLOAD HANDLER
+// ==========================================
+function downloadCurrentVideo() {
+  if (!bingeData || !bingeData.playlist || bingeData.playlist.length === 0) {
+    showToast("No video available to download.");
+    return;
+  }
+  
+  // 1. Get the exact link currently playing based on active index
+  const currentItem = bingeData.playlist[bingeData.currentIndex];
+  let link = typeof currentItem === "string" ? currentItem : currentItem.url;
+  
+  try { 
+    if (!link.startsWith("http")) link = atob(link); 
+  } catch(e) {
+    console.error("Link decoding failed", e);
+  }
+
+  // 2. Prevent downloading of streaming manifests (HLS/DASH)
+  if (link.includes('.m3u8') || link.includes('.mpd')) {
+    showToast("Live streams (.m3u8) cannot be downloaded directly.");
+    return;
+  }
+
+  // 3. Trigger the download
+  showToast("Preparing Download...");
+  
+  const a = document.createElement('a');
+  a.href = link;
+  a.target = '_blank'; // Fallback for cross-origin downloads
+  
+  // Create a smart filename based on the episode name or active key
+  let fileName = "NTM_Stream_Video.mp4";
+  if (typeof currentItem === "object" && currentItem.episode) {
+    fileName = currentItem.episode.replace(/[^a-zA-Z0-9 -]/g, "") + ".mp4";
+  } else if (activeVideoKey) {
+    fileName = activeVideoKey + ".mp4";
+  }
+  
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}

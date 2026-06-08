@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NTM Test Stream</title>
+  
+  <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
+
+  <style>
+    /* Basic styling for the test page */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #0f111a;
+      color: white;
+      text-align: center;
+      padding-top: 50px;
+      transition: background 0s;
+    }
+    .video-container {
+      max-width: 800px;
+      margin: 0 auto;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .instructions {
+      margin-top: 20px;
+      padding: 15px;
+      background: rgba(255,255,255,0.1);
+      display: inline-block;
+      border-radius: 8px;
+    }
+
+    /* =========================================
+       🕵️‍♂️ BOSS KEY (PRIVACY MODE) CSS
+       ========================================= */
+    /* 1. Hide everything on the page */
+    body.boss-mode-active * {
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+    
+    /* 2. Turn the background completely white */
+    body.boss-mode-active {
+      background: #ffffff !important; 
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Boss Key Integration Test</h1>
+
+  <div class="video-container">
+    <video 
+      id="testPlayer" 
+      class="video-js vjs-default-skin vjs-big-play-centered" 
+      controls 
+      preload="auto" 
+      width="800" 
+      height="450">
+      <source src="https://vjs.zencdn.net/v/oceans.mp4" type="video/mp4" />
+    </video>
+  </div>
+
+  <div class="instructions">
+    <h3>How to trigger Privacy Mode:</h3>
+    <p>💻 <strong>Desktop:</strong> Press the <b>'B'</b> key or <b>'Escape'</b></p>
+    <p>📱 <strong>Mobile:</strong> Rapidly <b>Triple-Tap</b> anywhere on the screen</p>
+  </div>
+
+  <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+
+  <script>
+    // Initialize the player
+    const player = videojs('testPlayer');
+
+    // ==========================================
+    // 🕵️‍♂️ SMART BOSS KEY (PRIVACY MODE) LOGIC
+    // ==========================================
+    let isBossMode = false;
+    const originalTitle = document.title;
+    let originalFavicon = "logo.png"; // Fallback for testing
+    let preBossVolume = 1;
+
+    function toggleBossMode() {
+      isBossMode = !isBossMode;
+      
+      if (isBossMode) {
+        // --- 1. ACTIVATE PRIVACY MODE ---
+        preBossVolume = player.volume(); // Remember their volume
+        player.pause();
+        player.volume(0); // Instantly mute
+        
+        // Change Tab Name and Icon to look like Google
+        document.title = "Google";
+        changeFavicon("https://www.google.com/favicon.ico");
+        
+        // Hide the website UI (turns screen white)
+        document.body.classList.add("boss-mode-active");
+        
+      } else {
+        // --- 2. DEACTIVATE PRIVACY MODE (COME BACK) ---
+        document.title = originalTitle; // Restore website name
+        changeFavicon(originalFavicon); // Restore original logo
+        
+        player.volume(preBossVolume); // Restore volume
+        document.body.classList.remove("boss-mode-active"); // Show UI again
+        
+        // Brief delay before showing alert so the screen paints first
+        setTimeout(() => {
+          alert("Privacy Mode Disabled. It is safe to resume your movie.");
+        }, 100);
+      }
+    }
+
+    // Helper function to swap the tab icon
+    function changeFavicon(src) {
+      let link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+      link.type = 'image/x-icon';
+      link.rel = 'icon';
+      link.href = src;
+      document.getElementsByTagName('head')[0].appendChild(link);
+    }
+
+    // --- DESKTOP TRIGGER: Press 'B' or 'Escape' ---
+    document.addEventListener("keydown", (e) => {
+      // Don't trigger if they are typing in a search box
+      if (document.activeElement.tagName === 'INPUT') return; 
+      
+      if (e.key.toLowerCase() === 'b' || e.key === 'Escape') {
+        e.preventDefault();
+        toggleBossMode();
+      }
+    });
+
+    // --- MOBILE TRIGGER: Triple-Tap Anywhere ---
+    let panicTapCount = 0;
+    let panicTapTimer;
+
+    document.addEventListener('touchstart', (e) => {
+      panicTapCount++;
+      clearTimeout(panicTapTimer);
+      
+      if (panicTapCount >= 3) {
+        // 3 taps detected! Fire the Boss Key
+        toggleBossMode();
+        panicTapCount = 0; // Reset counter
+      } else {
+        // They have 600 milliseconds to complete the 3 taps
+        panicTapTimer = setTimeout(() => { 
+          panicTapCount = 0; 
+        }, 600); 
+      }
+    });
+  </script>
+
+</body>
+</html>

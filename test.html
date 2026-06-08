@@ -3,19 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NTM Test Stream</title>
+  <title>NTM Smart Pause Test</title>
   
   <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
 
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/face_detection.js" crossorigin="anonymous"></script>
+
   <style>
-    /* Basic styling for the test page */
     body {
       font-family: Arial, sans-serif;
       background-color: #0f111a;
       color: white;
       text-align: center;
-      padding-top: 50px;
-      transition: background 0s;
+      padding-top: 30px;
     }
     .video-container {
       max-width: 800px;
@@ -23,33 +24,60 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.8);
       border-radius: 12px;
       overflow: hidden;
+      position: relative;
     }
-    .instructions {
+    .controls {
       margin-top: 20px;
       padding: 15px;
-      background: rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.05);
       display: inline-block;
+      border-radius: 12px;
+    }
+    .btn {
+      background: linear-gradient(135deg, #007bff, #00bfff);
+      border: none;
+      color: white;
+      padding: 12px 24px;
       border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 16px;
+      transition: 0.3s;
     }
-
-    /* =========================================
-       🕵️‍♂️ BOSS KEY (PRIVACY MODE) CSS
-       ========================================= */
-    /* 1. Hide everything on the page */
-    body.boss-mode-active * {
-      opacity: 0 !important;
-      pointer-events: none !important;
-    }
+    .btn:hover { transform: scale(1.05); }
+    .btn.active { background: linear-gradient(135deg, #ff0055, #ff0000); }
     
-    /* 2. Turn the background completely white */
-    body.boss-mode-active {
-      background: #ffffff !important; 
+    #statusBadge {
+      display: inline-block;
+      margin-left: 15px;
+      padding: 8px 15px;
+      border-radius: 20px;
+      background: #333;
+      font-size: 14px;
+      font-weight: bold;
+    }
+    .status-watching { background: #00cc66 !important; color: black; }
+    .status-away { background: #ffcc00 !important; color: black; }
+
+    /* The tiny webcam preview in the bottom right corner */
+    .webcam-preview {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 160px;
+      height: 120px;
+      background: black;
+      border: 2px solid #00bfff;
+      border-radius: 8px;
+      display: none; /* Hidden until activated */
+      transform: scaleX(-1); /* Mirror image */
+      z-index: 9999;
     }
   </style>
 </head>
 <body>
 
-  <h1>Boss Key Integration Test</h1>
+  <h1>Smart Pause (AI Engine) Test</h1>
 
   <div class="video-container">
     <video 
@@ -63,97 +91,133 @@
     </video>
   </div>
 
-  <div class="instructions">
-    <h3>How to trigger Privacy Mode:</h3>
-    <p>💻 <strong>Desktop:</strong> Press the <b>'B'</b> key or <b>'Escape'</b></p>
-    <p>📱 <strong>Mobile:</strong> Rapidly <b>Triple-Tap</b> anywhere on the screen</p>
+  <div class="controls">
+    <button id="toggleEngineBtn" class="btn">👁 Enable Smart Pause</button>
+    <div id="statusBadge">Engine Offline</div>
+    <p style="color: #aaa; font-size: 12px; margin-top: 15px;">Note: Video processing is 100% local. No data leaves your browser.</p>
   </div>
+
+  <video id="webcamFeed" class="webcam-preview" autoplay playsinline></video>
 
   <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
 
   <script>
-    // Initialize the player
     const player = videojs('testPlayer');
+    const toggleBtn = document.getElementById('toggleEngineBtn');
+    const statusBadge = document.getElementById('statusBadge');
+    const webcamVideo = document.getElementById('webcamFeed');
 
-    // ==========================================
-    // 🕵️‍♂️ SMART BOSS KEY (PRIVACY MODE) LOGIC
-    // ==========================================
-    let isBossMode = false;
-    const originalTitle = document.title;
-    let originalFavicon = "logo.png"; // Fallback for testing
-    let preBossVolume = 1;
+    let isEngineRunning = false;
+    let camera = null;
+    let faceDetection = null;
 
-    function toggleBossMode() {
-      isBossMode = !isBossMode;
+    // --- TIMERS & STATE ---
+    let isLookingAway = false;
+    let lookAwayTimer = null;
+    const LOOK_AWAY_THRESHOLD = 3000; // 3 seconds of not looking = Pause
+
+    // 1. Initialize Google MediaPipe Face Detection
+    function initAI() {
+      statusBadge.innerText = "Loading AI Model...";
       
-      if (isBossMode) {
-        // --- 1. ACTIVATE PRIVACY MODE ---
-        preBossVolume = player.volume(); // Remember their volume
-        player.pause();
-        player.volume(0); // Instantly mute
+      faceDetection = new FaceDetection({locateFile: (file) => {
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/${file}`;
+      }});
+
+      faceDetection.setOptions({
+        model: 'short', // 'short' is best for faces close to the screen
+        minDetectionConfidence: 0.5
+      });
+
+      faceDetection.onResults(handleAIResults);
+
+      // Connect webcam to MediaPipe
+      camera = new Camera(webcamVideo, {
+        onFrame: async () => {
+          if (isEngineRunning) {
+            await faceDetection.send({image: webcamVideo});
+          }
+        },
+        width: 320,
+        height: 240
+      });
+    }
+
+    // 2. Process the results frame-by-frame
+    function handleAIResults(results) {
+      if (!isEngineRunning) return;
+
+      // If faces are detected (User is looking at screen)
+      if (results.detections && results.detections.length > 0) {
         
-        // Change Tab Name and Icon to look like Google
-        document.title = "Google";
-        changeFavicon("https://www.google.com/favicon.ico");
+        // Reset the timer since they are looking
+        clearTimeout(lookAwayTimer);
+        lookAwayTimer = null;
         
-        // Hide the website UI (turns screen white)
-        document.body.classList.add("boss-mode-active");
-        
-      } else {
-        // --- 2. DEACTIVATE PRIVACY MODE (COME BACK) ---
-        document.title = originalTitle; // Restore website name
-        changeFavicon(originalFavicon); // Restore original logo
-        
-        player.volume(preBossVolume); // Restore volume
-        document.body.classList.remove("boss-mode-active"); // Show UI again
-        
-        // Brief delay before showing alert so the screen paints first
-        setTimeout(() => {
-          alert("Privacy Mode Disabled. It is safe to resume your movie.");
-        }, 100);
+        statusBadge.innerText = "👀 Watching";
+        statusBadge.className = "status-watching";
+
+        // If they WERE looking away, but just came back!
+        if (isLookingAway) {
+          isLookingAway = false;
+          
+          // Rewind 3 seconds so they don't miss anything
+          let newTime = Math.max(0, player.currentTime() - 3);
+          player.currentTime(newTime);
+          
+          // Auto-resume
+          player.play();
+          console.log("Face returned! Rewinding 3s and playing.");
+        }
+      } 
+      // If NO face is detected (User looked away or left)
+      else {
+        // If they are currently watching, and we haven't started the timer yet
+        if (!isLookingAway && !lookAwayTimer) {
+          
+          statusBadge.innerText = "⏳ Looking Away...";
+          statusBadge.className = "status-away";
+          
+          // Start the 3-second countdown
+          lookAwayTimer = setTimeout(() => {
+            isLookingAway = true;
+            player.pause(); // PAUSE THE MOVIE!
+            statusBadge.innerText = "⏸ Auto-Paused";
+            statusBadge.className = "";
+            console.log("User looked away for 3s. Paused.");
+          }, LOOK_AWAY_THRESHOLD);
+        }
       }
     }
 
-    // Helper function to swap the tab icon
-    function changeFavicon(src) {
-      let link = document.querySelector("link[rel*='icon']") || document.createElement('link');
-      link.type = 'image/x-icon';
-      link.rel = 'icon';
-      link.href = src;
-      document.getElementsByTagName('head')[0].appendChild(link);
-    }
-
-    // --- DESKTOP TRIGGER: Press 'B' or 'Escape' ---
-    document.addEventListener("keydown", (e) => {
-      // Don't trigger if they are typing in a search box
-      if (document.activeElement.tagName === 'INPUT') return; 
-      
-      if (e.key.toLowerCase() === 'b' || e.key === 'Escape') {
-        e.preventDefault();
-        toggleBossMode();
-      }
-    });
-
-    // --- MOBILE TRIGGER: Triple-Tap Anywhere ---
-    let panicTapCount = 0;
-    let panicTapTimer;
-
-    document.addEventListener('touchstart', (e) => {
-      panicTapCount++;
-      clearTimeout(panicTapTimer);
-      
-      if (panicTapCount >= 3) {
-        // 3 taps detected! Fire the Boss Key
-        toggleBossMode();
-        panicTapCount = 0; // Reset counter
+    // 3. Toggle Button Logic
+    toggleBtn.addEventListener('click', () => {
+      if (!isEngineRunning) {
+        // TURN ON
+        isEngineRunning = true;
+        toggleBtn.innerText = "🛑 Disable Smart Pause";
+        toggleBtn.classList.add('active');
+        webcamVideo.style.display = "block"; // Show camera preview
+        
+        if (!faceDetection) initAI();
+        camera.start();
+        
       } else {
-        // They have 600 milliseconds to complete the 3 taps
-        panicTapTimer = setTimeout(() => { 
-          panicTapCount = 0; 
-        }, 600); 
+        // TURN OFF
+        isEngineRunning = false;
+        toggleBtn.innerText = "👁 Enable Smart Pause";
+        toggleBtn.classList.remove('active');
+        webcamVideo.style.display = "none";
+        statusBadge.innerText = "Engine Offline";
+        statusBadge.className = "";
+        
+        if (camera) camera.stop();
+        clearTimeout(lookAwayTimer);
+        lookAwayTimer = null;
+        isLookingAway = false;
       }
     });
+
   </script>
-
 </body>
 </html>
